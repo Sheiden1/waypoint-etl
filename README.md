@@ -14,6 +14,8 @@ dados reais exige avaliação própria de segurança, infraestrutura e LGPD.
 O Waypoint é um projeto independente, sem vínculo com a HashiCorp ou qualquer
 outra organização que use o nome Waypoint.
 
+Versão atual: [v0.1.0](https://github.com/Sheiden1/waypoint-etl/releases/tag/v0.1.0).
+
 ![Resultado de uma validação no Waypoint](docs/screenshots/waypoint-result.svg)
 
 [▶ Assista à demonstração curta](docs/demo/waypoint-demo.mp4)

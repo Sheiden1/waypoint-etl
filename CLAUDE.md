@@ -1049,14 +1049,14 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 >
 > Adicionados guia de contribuição, código de conduta, política de segurança,
 > changelog, templates de issue/PR, pre-commit, arquitetura e guia De/Para. A
-> licença MIT existente foi preservada. A validação local alcançou 95% de
-> cobertura; Docker será comprovado pelo runner Linux porque não está instalado
-> nesta máquina.
+> licença MIT existente foi preservada. O CI final executou 514 testes com
+> Tesseract e PostgreSQL reais, atingiu 95,75% de cobertura e comprovou o
+> healthcheck do Compose no runner Linux.
 
-### Dia 12 — Publicação (em conclusão)
+### Dia 12 — Publicação ✅ (concluído no repositório)
 
 - [x] revisão completa;
-- [ ] release `v0.1.0`;
+- [x] release `v0.1.0`;
 - [x] screenshots;
 - [x] GIF ou vídeo;
 - [x] README em português com resumo em inglês;
@@ -1069,9 +1069,12 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 > capturas vetoriais, um vídeo MP4 curto, notas da release e o texto pronto para
 > LinkedIn em `docs/linkedin-v0.1.0.md`.
 >
-> A tag depende do CI verde no GitHub. A publicação no LinkedIn permanece como
-> ação externa: não há conector disponível nesta sessão, mas o conteúdo está
-> pronto para copiar e publicar.
+> A release pública está em
+> `https://github.com/Sheiden1/waypoint-etl/releases/tag/v0.1.0`, com wheel,
+> source distribution, notas e vídeo. O relato privado de vulnerabilidades está
+> habilitado e as labels sugeridas existem no repositório. A publicação no
+> LinkedIn permanece como única ação externa: não há conector disponível nesta
+> sessão, mas o conteúdo está pronto para copiar e publicar.
 
 ---
 
