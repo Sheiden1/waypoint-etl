@@ -854,12 +854,22 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 > implementados. Ruff, mypy (strict) e Pytest verdes; cobertura do `domain`
 > ~99%.
 
-### Dia 2 — Dados tabulares
+### Dia 2 — Dados tabulares ✅ (concluído)
 
-- extrator CSV;
-- extrator Excel;
-- suporte a abas e cabeçalho configurável;
-- testes.
+- [x] extrator CSV;
+- [x] extrator Excel;
+- [x] suporte a abas e cabeçalho configurável;
+- [x] testes.
+
+> Contratos da extração em `application/dto/extraction.py` (`ExtractionOptions`,
+> `SourceRecord`, `ExtractionResult`) e port `Extractor` em
+> `application/ports/`. `CsvExtractor` (stdlib `csv`, detecção de codificação e
+> delimitador) e `ExcelExtractor` (openpyxl somente leitura, sem macros) em
+> `infrastructure/extractors/`, com `detect_format`/`get_extractor` por
+> extensão. Toda célula vira texto bruto ou `None`; linhas curtas, longas ou em
+> branco não interrompem o lote e cada registro guarda o número da linha de
+> origem. Planilha de demonstração com duas abas e cabeçalho na linha 2 gerada
+> por `make demo-data`. 124 testes verdes; Ruff e mypy (strict) limpos.
 
 ### Dia 3 — Documentos
 
