@@ -1,0 +1,50 @@
+name: waypoint-etl
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: waypoint
+      POSTGRES_USER: waypoint
+      POSTGRES_PASSWORD: waypoint
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waypoint -d waypoint"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+    environment:
+      APP_ENV: production
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql+psycopg://waypoint:waypoint@db:5432/waypoint
+      MAX_UPLOAD_MB: 25
+      OCR_LANGUAGE: por
+      EXPORT_DIR: /app/exports
+    depends_on:
+      db:
+        condition: service_healthy
+    command:
+      - sh
+      - -c
+      - >-
+        alembic upgrade head &&
+        exec streamlit run src/waypoint_etl/presentation/streamlit/app.py
+        --server.address=0.0.0.0 --server.port=8501
+    ports:
+      - "8501:8501"
+    volumes:
+      - exports:/app/exports
+    restart: unless-stopped
+
+volumes:
+  exports:
+  postgres-data:

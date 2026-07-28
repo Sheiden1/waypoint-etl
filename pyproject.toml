@@ -61,8 +61,10 @@ dev = [
 waypoint-etl = "waypoint_etl.presentation.cli.main:app"
 
 [project.urls]
-Homepage = "https://github.com/your-org/waypoint-etl"
-Repository = "https://github.com/your-org/waypoint-etl"
+Homepage = "https://github.com/Sheiden1/waypoint-etl"
+Repository = "https://github.com/Sheiden1/waypoint-etl"
+Issues = "https://github.com/Sheiden1/waypoint-etl/issues"
+Changelog = "https://github.com/Sheiden1/waypoint-etl/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/waypoint_etl"]
@@ -144,3 +146,4 @@ omit = ["*/presentation/streamlit/*"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
+fail_under = 80

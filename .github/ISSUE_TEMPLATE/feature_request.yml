@@ -1,0 +1,35 @@
+name: Sugerir melhoria
+description: Proponha uma melhoria alinhada ao roadmap do Waypoint.
+title: "[Melhoria]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Antes de propor, confira o roadmap no CLAUDE.md. Funcionalidades fora
+        do MVP devem indicar em qual versão futura se encaixam.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema
+      description: Qual problema de migração de dados esta proposta resolve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+      description: Descreva a menor solução suficiente.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Segurança
+      options:
+        - label: A proposta e os exemplos usam somente dados sintéticos.
+          required: true

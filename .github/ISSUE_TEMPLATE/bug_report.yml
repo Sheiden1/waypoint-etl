@@ -1,0 +1,52 @@
+name: Relatar um bug
+description: Informe um comportamento reproduzível que não funcionou como esperado.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar o Waypoint. Não inclua dados pessoais, segredos ou
+        arquivos de clientes.
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição
+      description: O que aconteceu e o que você esperava?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Como reproduzir
+      description: Liste comandos, formato sintético usado e passos mínimos.
+      placeholder: |
+        1. Execute ...
+        2. Envie ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versão
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: interface
+    attributes:
+      label: Interface
+      options:
+        - CLI
+        - Streamlit
+        - Biblioteca Python
+        - Docker
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs sanitizados
+      description: Remova documentos, e-mails, credenciais e URLs de banco.
+      render: shell
