@@ -76,6 +76,18 @@ python -m ruff format .
 python -m waypoint_etl.demo
 ```
 
+## Dados de demonstração
+
+`make demo-data` (ou `python -m waypoint_etl.demo`) escreve em `samples/input/`:
+
+| Arquivo                 | Conteúdo                                                     |
+| ----------------------- | ------------------------------------------------------------ |
+| `clientes_legado.csv`   | clientes legados com máscaras, datas e sujeira variadas       |
+| `clientes_legado.xlsx`  | abas `Clientes` (cabeçalho na linha 2) e `Contatos`           |
+
+Todos os registros são sintéticos e gerados com semente fixa: nenhum dado
+pessoal real é usado ou versionado.
+
 ## Licença
 
 Distribuído sob a licença [MIT](LICENSE).

@@ -14,6 +14,8 @@ import csv
 from pathlib import Path
 from random import Random
 
+from openpyxl import Workbook
+
 from .documents import generate_cnpj, generate_cpf
 
 # Cabeçalhos legados (origem). Não confundir com o schema canônico de destino.
@@ -46,6 +48,25 @@ _CITIES = [
     ("Recife", "PE"), ("Fortaleza", "CE"), ("Manaus", "AM"), ("Goiânia", "GO"),
 ]
 _DATE_FORMATS = ["%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"]
+
+# Cabeçalhos legados da aba de contatos da planilha de demonstração.
+CONTACT_HEADERS = [
+    "Código Cliente",
+    "CPF_CNPJ Cliente",
+    "Nome Contato",
+    "Cargo",
+    "Correio Eletrônico",
+    "Fone",
+]
+
+# A aba de clientes começa com uma linha de título, como em exportações reais:
+# o cabeçalho fica na linha 2 (ver ``header_row`` no template De/Para).
+CUSTOMERS_SHEET_TITLE = "Relatório de Clientes - ERP Legado (export)"
+CUSTOMERS_SHEET_NAME = "Clientes"
+CONTACTS_SHEET_NAME = "Contatos"
+CUSTOMERS_HEADER_ROW = 2
+
+_ROLES = ["Comprador", "Financeiro", "Diretor", "Gerente", "Sócio"]
 
 
 def _mask_cpf(digits: str, rng: Random) -> str:
@@ -172,6 +193,37 @@ def _append_duplicates(rows: list[dict[str, str]], rng: Random) -> None:
         rows.append(duplicate)
 
 
+def generate_contact_rows(
+    customer_rows: list[dict[str, str]], *, seed: int = 20240101, count: int = 12
+) -> list[dict[str, str]]:
+    """Gera contatos sintéticos vinculados aos clientes informados.
+
+    Inclui casos sem e-mail e sem telefone para exercitar a regra "pelo menos
+    e-mail ou telefone" da validação de contatos (seção 13).
+    """
+    rng = Random(seed + 1)
+    rows: list[dict[str, str]] = []
+
+    for index, customer in enumerate(customer_rows[:count]):
+        name = f"{rng.choice(_FIRST_NAMES)} {rng.choice(_LAST_NAMES)}"
+        slug = name.lower().replace(" ", ".")
+        rows.append(
+            {
+                "Código Cliente": customer["Código"],
+                "CPF_CNPJ Cliente": customer["CPF_CNPJ"],
+                "Nome Contato": name,
+                "Cargo": rng.choice(_ROLES),
+                # Um contato a cada quatro fica sem e-mail e outro sem telefone.
+                "Correio Eletrônico": (
+                    "" if index % 4 == 0 else f"{slug}@exemplo.com.br"
+                ),
+                "Fone": "" if index % 4 == 1 else _phone(rng),
+            }
+        )
+
+    return rows
+
+
 def write_customers_csv(path: Path, *, seed: int = 20240101, count: int = 50) -> Path:
     """Escreve o CSV de clientes legados em ``path`` e retorna o caminho."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -180,4 +232,35 @@ def write_customers_csv(path: Path, *, seed: int = 20240101, count: int = 50) ->
         writer = csv.DictWriter(handle, fieldnames=CSV_HEADERS)
         writer.writeheader()
         writer.writerows(rows)
+    return path
+
+
+def write_legacy_xlsx(path: Path, *, seed: int = 20240101, count: int = 50) -> Path:
+    """Escreve a planilha legada com duas abas (``Clientes`` e ``Contatos``).
+
+    A aba de clientes traz uma linha de título antes do cabeçalho, exercitando o
+    ``header_row`` configurável dos templates De/Para.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    customer_rows = generate_customer_rows(seed=seed, count=count)
+    contact_rows = generate_contact_rows(customer_rows, seed=seed)
+
+    workbook = Workbook()
+    default_sheet = workbook.active
+    if default_sheet is not None:
+        workbook.remove(default_sheet)
+
+    customers = workbook.create_sheet(CUSTOMERS_SHEET_NAME)
+    customers.append([CUSTOMERS_SHEET_TITLE])
+    customers.append(CSV_HEADERS)
+    for row in customer_rows:
+        customers.append([row[header] for header in CSV_HEADERS])
+
+    contacts = workbook.create_sheet(CONTACTS_SHEET_NAME)
+    contacts.append(CONTACT_HEADERS)
+    for contact in contact_rows:
+        contacts.append([contact[header] for header in CONTACT_HEADERS])
+
+    workbook.save(path)
+    workbook.close()
     return path

@@ -13,15 +13,19 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from .synthetic import write_customers_csv
+from .synthetic import write_customers_csv, write_legacy_xlsx
 
 
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
     base = Path(args[0]) if args else Path("samples/input")
-    target = write_customers_csv(base / "clientes_legado.csv")
+    targets = [
+        write_customers_csv(base / "clientes_legado.csv"),
+        write_legacy_xlsx(base / "clientes_legado.xlsx"),
+    ]
     # Saída de script utilitário (fora do núcleo da aplicação).
-    print(f"Dados de demonstração gerados em: {target}")
+    for target in targets:
+        print(f"Dados de demonstração gerados em: {target}")
     return 0
 
 
