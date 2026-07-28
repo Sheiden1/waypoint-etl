@@ -26,6 +26,14 @@ uploads/
 exports/
 tmp/
 
+# Fixtures binários de demonstração: gerados por `make demo-data`. Os
+# containers ZIP (.xlsx/.docx) e o PDF gravam data de modificação e um /ID
+# novos a cada execução, então versioná-los criaria um diff a cada geração.
+# As versões em texto (.csv e .txt) continuam versionadas.
+samples/input/*.xlsx
+samples/input/*.docx
+samples/input/*.pdf
+
 # IDE / SO
 .idea/
 .vscode/

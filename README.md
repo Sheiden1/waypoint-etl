@@ -84,9 +84,15 @@ python -m waypoint_etl.demo
 | ----------------------- | ------------------------------------------------------------ |
 | `clientes_legado.csv`   | clientes legados com máscaras, datas e sujeira variadas       |
 | `clientes_legado.xlsx`  | abas `Clientes` (cabeçalho na linha 2) e `Contatos`           |
+| `clientes_legado.txt`   | relatório em texto puro no estilo de exportação antiga        |
+| `ficha_cadastral.docx`  | fichas em Word, com parágrafos e tabelas rótulo/valor         |
+| `ficha_cadastral.pdf`   | fichas em PDF com camada de texto (uma por página)            |
 
 Todos os registros são sintéticos e gerados com semente fixa: nenhum dado
 pessoal real é usado ou versionado.
+
+Os arquivos binários (`.xlsx`, `.docx` e `.pdf`) não são versionados — gere-os
+com `make demo-data` após clonar o repositório.
 
 ## Licença
 
