@@ -24,9 +24,38 @@ class InvalidValueError(DomainError):
     """Valor inválido para um value object (e-mail, telefone, CEP, UF...)."""
 
 
+class ExtractionError(WaypointError):
+    """Falha controlada ao ler um arquivo de origem.
+
+    Um arquivo inválido gera uma falha controlada; uma linha inválida, não
+    (seção 17). Portanto este erro sinaliza problemas do arquivo como um todo.
+    """
+
+
+class UnsupportedFormatError(ExtractionError):
+    """A extensão do arquivo não corresponde a nenhum formato suportado."""
+
+
+class SourceNotFoundError(ExtractionError):
+    """O arquivo de origem não existe ou não é um arquivo regular."""
+
+
+class SheetNotFoundError(ExtractionError):
+    """A aba informada no mapeamento não existe na planilha."""
+
+
+class EmptySourceError(ExtractionError):
+    """O arquivo não possui cabeçalho ou nenhuma linha de dados."""
+
+
 __all__ = [
     "DomainError",
+    "EmptySourceError",
+    "ExtractionError",
     "InvalidDocumentError",
     "InvalidValueError",
+    "SheetNotFoundError",
+    "SourceNotFoundError",
+    "UnsupportedFormatError",
     "WaypointError",
 ]
