@@ -890,31 +890,57 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 > gerados por `make demo-data`. 167 testes verdes; Ruff e mypy (strict) limpos;
 > cobertura 90%.
 
-### Dia 4 — De/Para
+### Dia 4 — De/Para ✅ (concluído)
 
-- schema YAML;
-- parser;
-- catálogo de transformações;
-- mensagens de erro;
-- testes.
+- [x] schema YAML;
+- [x] parser;
+- [x] catálogo de transformações;
+- [x] mensagens de erro;
+- [x] testes.
 
-### Dia 5 — Limpeza
+> `MappingTemplate`/`FieldMapping`/`SourceSpec` em `pipeline/mappers/schema.py`
+> e o parser em `loader.py`, cobrindo as cinco falhas da seção 10 com mensagem
+> acionável. O catálogo de transformações é **fechado**: um template escolhe
+> entre funções auditáveis, nunca executa código arbitrário. `SourceSpec` passa
+> a alimentar o `ExtractionOptions`, então aba e `header_row` deixam de ser
+> informados na mão. `apply_mapping` falha antes de processar qualquer linha
+> quando faltam colunas — template errado é erro de configuração, não lote
+> rejeitado. Templates em `mappings/` para as três entidades.
 
-- datas;
-- moeda;
-- documentos;
-- telefones;
-- e-mails;
-- Regex;
-- testes.
+### Dia 5 — Limpeza ✅ (concluído)
 
-### Dia 6 — Qualidade
+- [x] datas;
+- [x] moeda;
+- [x] documentos;
+- [x] telefones;
+- [x] e-mails;
+- [x] Regex;
+- [x] testes.
 
-- validações;
-- severidades;
-- rejeitados;
-- deduplicação;
-- testes.
+> Implementado **antes** do Dia 4, porque o catálogo de transformações depende
+> dele. `pipeline/normalizers/`: texto (controle, Unicode NFC, marcadores
+> nulos, `title_case` com partículas), datas brasileiras (dia antes do mês, e
+> `None` em vez de adivinhar), moeda em `Decimal` (nunca `float`), documento,
+> telefone e CEP (recupera o zero à esquerda perdido pela planilha).
+> `pipeline/cleaners/patterns.py` extrai CPF, CNPJ, e-mail, telefone, CEP,
+> datas e valores de texto livre — com os documentos conferidos pelos dígitos
+> verificadores, para não confundir protocolo com CPF.
+
+### Dia 6 — Qualidade ✅ (concluído)
+
+- [x] validações;
+- [x] severidades;
+- [x] rejeitados;
+- [x] deduplicação;
+- [x] testes.
+
+> `Issue` (domínio) com `code`, `message`, `field`, `severity`,
+> `original_value` e `normalized_value`, além de `for_display()`, que mascara
+> CPF/CNPJ para a auditoria (seção 18). Validadores das três entidades
+> devolvem **todos** os problemas de uma vez e produzem a entidade canônica
+> quando o registro é válido. Deduplicação exata (documento, identificador
+> externo, e-mail) e aproximada (nome semelhante + telefone ou CEP), que apenas
+> alerta: o MVP nunca mescla registros.
 
 ### Dia 7 — Banco
 

@@ -65,6 +65,7 @@ Com `make` (Linux/macOS):
 | `make typecheck` | executa o mypy                         |
 | `make format`    | formata o código com Ruff              |
 | `make demo-data` | gera os dados sintéticos de demonstração |
+| `make dev`       | interface Streamlit (indisponível até o Dia 10)  |
 
 Equivalentes sem `make` (Windows):
 
@@ -93,6 +94,33 @@ pessoal real é usado ou versionado.
 
 Os arquivos binários (`.xlsx`, `.docx` e `.pdf`) não são versionados — gere-os
 com `make demo-data` após clonar o repositório.
+
+## Mapeamento De/Para
+
+O mapeamento entre as colunas de origem e o schema canônico é declarado em YAML
+e versionado em `mappings/`:
+
+| Template                       | Entidade    |
+| ------------------------------ | ----------- |
+| `erp_legacy_customers.yaml`    | `customers` |
+| `erp_legacy_contacts.yaml`     | `contacts`  |
+| `erp_legacy_invoices.yaml`     | `invoices`  |
+
+O bloco `source` diz como ler o arquivo (aba, linha do cabeçalho, delimitador) e
+cada campo declara o destino canônico e as transformações aplicadas:
+
+```yaml
+fields:
+  CPF_CNPJ:
+    target: document
+    required: true
+    transforms:
+      - digits_only
+```
+
+As transformações vêm de um catálogo fechado: um template escolhe entre funções
+conhecidas e auditáveis, nunca executa código arbitrário. Um nome inexistente
+faz o carregamento falhar listando as opções válidas.
 
 ## Licença
 
