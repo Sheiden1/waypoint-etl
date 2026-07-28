@@ -1,0 +1,49 @@
+# Template De/Para: contatos do ERP legado fictício.
+# Compatível com a aba "Contatos" de samples/input/clientes_legado.xlsx.
+version: 1
+name: ERP Legado - Contatos
+entity: contacts
+
+source:
+  type: excel
+  sheet: Contatos
+  header_row: 1
+
+fields:
+  Código Cliente:
+    target: external_id
+    required: false
+    transforms:
+      - clean_text
+
+  CPF_CNPJ Cliente:
+    target: customer_document
+    required: true
+    transforms:
+      - digits_only
+
+  Nome Contato:
+    target: name
+    required: true
+    transforms:
+      - clean_text
+      - title_case
+
+  Cargo:
+    target: role
+    required: false
+    transforms:
+      - clean_text
+      - title_case
+
+  Correio Eletrônico:
+    target: email
+    required: false
+    transforms:
+      - email
+
+  Fone:
+    target: phone
+    required: false
+    transforms:
+      - brazilian_phone

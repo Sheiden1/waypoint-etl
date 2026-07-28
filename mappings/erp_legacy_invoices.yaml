@@ -1,0 +1,57 @@
+# Template De/Para: cobranças do ERP legado fictício.
+# O gerador de dados de cobranças chega junto com o pipeline completo; este
+# template já fixa o contrato de colunas esperado.
+version: 1
+name: ERP Legado - Cobranças
+entity: invoices
+
+source:
+  type: csv
+  header_row: 1
+
+fields:
+  Documento:
+    target: external_id
+    required: true
+    transforms:
+      - clean_text
+
+  CPF_CNPJ Cliente:
+    target: customer_document
+    required: true
+    transforms:
+      - digits_only
+
+  Historico:
+    target: description
+    required: false
+    transforms:
+      - clean_text
+
+  Data Emissao:
+    target: issued_at
+    required: true
+    transforms:
+      - clean_text
+      - brazilian_date
+
+  Data Vencimento:
+    target: due_at
+    required: true
+    transforms:
+      - clean_text
+      - brazilian_date
+
+  Valor:
+    target: amount
+    required: true
+    transforms:
+      - clean_text
+      - brazilian_money
+
+  Situacao:
+    target: status
+    required: true
+    transforms:
+      - clean_text
+      - lowercase

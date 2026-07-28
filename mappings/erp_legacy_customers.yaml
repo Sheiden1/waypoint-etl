@@ -1,0 +1,72 @@
+# Template De/Para: clientes do ERP legado fictício.
+# Compatível com samples/input/clientes_legado.csv e a aba "Clientes" de
+# samples/input/clientes_legado.xlsx (cabeçalho na linha 2).
+version: 1
+name: ERP Legado - Clientes
+entity: customers
+
+source:
+  type: excel
+  sheet: Clientes
+  header_row: 2
+
+fields:
+  Código:
+    target: external_id
+    required: false
+    transforms:
+      - clean_text
+
+  Nome Cliente:
+    target: full_name
+    required: true
+    transforms:
+      - clean_text
+      - title_case
+
+  CPF_CNPJ:
+    target: document
+    required: true
+    transforms:
+      - digits_only
+
+  Correio Eletrônico:
+    target: email
+    required: false
+    transforms:
+      - email
+
+  Fone Principal:
+    target: phone
+    required: false
+    transforms:
+      - brazilian_phone
+
+  CEP:
+    target: postal_code
+    required: false
+    transforms:
+      - postal_code
+
+  Cidade:
+    target: city
+    required: false
+    transforms:
+      - clean_text
+      - title_case
+
+  UF:
+    target: state
+    required: false
+    transforms:
+      - uf
+
+  Data Cadastro:
+    target: created_at
+    required: false
+    transforms:
+      - clean_text
+      - brazilian_date
+
+ignored_fields:
+  - Observação Interna Antiga
