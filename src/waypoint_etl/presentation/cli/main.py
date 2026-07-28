@@ -61,19 +61,20 @@ def inspect(
     """Mostra formato, colunas e uma prévia do conteúdo de um arquivo."""
     _configure(verbose)
     from waypoint_etl.application.dto.extraction import ExtractionOptions
+    from waypoint_etl.infrastructure.ocr.tesseract import TesseractEngine
 
     with _handled():
         preview = inspect_source(
-            path, options=ExtractionOptions(sheet=sheet, header_row=header_row)
+            path,
+            options=ExtractionOptions(sheet=sheet, header_row=header_row),
+            ocr_engine=TesseractEngine(),
         )
     _render_preview(preview)
 
 
 @app.command()
 def migrate(
-    input: Annotated[
-        Path, typer.Option("--input", "-i", help="Arquivo de origem.")
-    ],
+    input: Annotated[Path, typer.Option("--input", "-i", help="Arquivo de origem.")],
     mapping: Annotated[
         Path, typer.Option("--mapping", "-m", help="Template De/Para em YAML.")
     ],
@@ -203,9 +204,7 @@ def _render_result(result: MigrationResult) -> None:
     typer.echo(f"Suspeitas:   {result.possible_duplicate_count}")
 
     if result.loaded_records:
-        typer.secho(
-            f"Carregados:  {result.loaded_records}", fg=typer.colors.GREEN
-        )
+        typer.secho(f"Carregados:  {result.loaded_records}", fg=typer.colors.GREEN)
 
     if result.stages:
         total_ms = sum(stage.duration_ms for stage in result.stages)

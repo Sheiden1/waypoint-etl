@@ -6,12 +6,8 @@ PYTHON ?= python
 install:
 	uv sync --extra dev
 
-# A interface Streamlit chega no Dia 10 do plano. Até lá o alvo falha de forma
-# explícita, no mesmo padrão dos comandos indisponíveis da CLI.
 dev:
-	@echo "Interface Streamlit indisponivel nesta versao (prevista para o Dia 10)."
-	@echo "Use a CLI: uv run waypoint-etl --help"
-	@exit 1
+	uv run streamlit run src/waypoint_etl/presentation/streamlit/app.py
 
 test:
 	$(PYTHON) -m pytest

@@ -1,1 +1,1 @@
-"""Interface Streamlit (assistente de cinco etapas)."""
+"""Interface Streamlit do Waypoint, organizada como assistente de cinco etapas."""

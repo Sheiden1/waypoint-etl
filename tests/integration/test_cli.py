@@ -81,6 +81,25 @@ def test_inspect_document_shows_a_text_preview(tmp_path: Path) -> None:
     assert "CPF/CNPJ:" in result.stdout
 
 
+def test_inspect_image_reports_missing_tesseract_as_controlled_error(
+    tmp_path: Path,
+) -> None:
+    from waypoint_etl.demo.document_files import write_scanned_form_image
+    from waypoint_etl.infrastructure.ocr.tesseract import TesseractEngine
+
+    source = write_scanned_form_image(tmp_path / "ficha.png")
+    available = TesseractEngine().is_available()
+
+    result = runner.invoke(app, ["inspect", str(source)])
+
+    assert result.exit_code == (0 if available else 2)
+    assert "Traceback" not in result.stderr
+    if available:
+        assert "OCR:      sim" in result.stdout
+    else:
+        assert "Tesseract" in result.stderr
+
+
 def test_inspect_rejects_unknown_format(tmp_path: Path) -> None:
     source = tmp_path / "dados.json"
     source.write_text("{}", encoding="utf-8")
@@ -179,9 +198,7 @@ def test_load_without_database_url_is_a_controlled_error(
     monkeypatch.delenv("DATABASE_URL", raising=False)
     get_settings.cache_clear()
 
-    result = _migrate(
-        workbook, tmp_path / "exports", "--no-dry-run", "--load-postgres"
-    )
+    result = _migrate(workbook, tmp_path / "exports", "--no-dry-run", "--load-postgres")
 
     assert result.exit_code == 2
     assert "DATABASE_URL" in result.stderr
@@ -232,9 +249,7 @@ def test_invalid_template_fails_before_processing(
 # --- conteúdo dos artefatos ---------------------------------------------------
 
 
-def test_accepted_csv_uses_the_canonical_schema(
-    workbook: Path, tmp_path: Path
-) -> None:
+def test_accepted_csv_uses_the_canonical_schema(workbook: Path, tmp_path: Path) -> None:
     output = tmp_path / "exports"
     _migrate(workbook, output)
     run_dir = next(output.iterdir())
@@ -245,9 +260,7 @@ def test_accepted_csv_uses_the_canonical_schema(
     assert len(lines) > 1
 
 
-def test_audit_report_has_the_required_metadata(
-    workbook: Path, tmp_path: Path
-) -> None:
+def test_audit_report_has_the_required_metadata(workbook: Path, tmp_path: Path) -> None:
     output = tmp_path / "exports"
     _migrate(workbook, output)
     run_dir = next(output.iterdir())
@@ -314,9 +327,7 @@ def test_audit_report_has_no_secrets(workbook: Path, tmp_path: Path) -> None:
     assert "traceback" not in raw
 
 
-def test_audit_report_counts_applied_transforms(
-    workbook: Path, tmp_path: Path
-) -> None:
+def test_audit_report_counts_applied_transforms(workbook: Path, tmp_path: Path) -> None:
     """Seção 16: o relatório mostra as correções automáticas aplicadas."""
     output = tmp_path / "exports"
     _migrate(workbook, output)
