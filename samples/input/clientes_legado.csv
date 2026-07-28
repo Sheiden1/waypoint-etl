@@ -1,0 +1,56 @@
+Código,Nome Cliente,CPF_CNPJ,Correio Eletrônico,Fone Principal,CEP,Cidade,UF,Data Cadastro,Observação Interna Antiga
+ERP-1000,  ALMEIDA S/A   ,98.949.230/0001-04,almeida.sa@exemplo.com.br,+55 87 99150-3689,69046-522,Manaus,AM,27-10-2019,
+ERP-1001,Nununes LTDA,59211226000184,nununes.ltda@exemplo.com.br,50923117298,41267-342,Curitiba,PR,27/11/2019,
+ERP-1002,Fábio Carvalho,49765051468,usuario@,+55 42 91029-5094,01637-227,Manaus,AM,2023-03-13,N/A
+ERP-1003,Silva S/A,18030155000136,silva.sa@exemplo.com.br,31991873719,36777-058,Fortaleza,CE,2021-12-05,
+ERP-1004,Souza EIRELI,111.111.111-11,souza.eireli@exemplo.com.br,25989965226,21041-622,Curitiba,PR,2023-07-31,cliente antigo
+ERP-1005,João Martins,302.760.189-07,joão.martins@exemplo.com.br,54904420259,28795-790,Curitiba,PR,03/05/2024,revisar
+ERP-1006,Ribeiro LTDA,56327122000141,ribeiro.ltda@exemplo.com.br,56967229800,55915-367,Manaus,AM,13-12-2021,revisar
+ERP-1007,Bruno Almeida,731.348.943-94,bruno.almeida@exemplo.com.br,23967900454,09327-900,Manaus,AM,17-04-2022,cliente antigo
+ERP-1008,João Nununes,92451724307,joão.nununes@exemplo.com.br,+55 46 98119-5949,,Recife,PE,05-03-2020,cliente antigo
+ERP-1009,Natália Barbosa,206.493.013-23,natália.barbosa@exemplo.com.br,+55 20 93957-5360,41680-083,Rio de Janeiro,RJ,05/01/2020,
+ERP-1010,Isabela Almeida,74667686871,isabela.almeida@exemplo.com.br,(74) 96611-2323,74909-064,Belo Horizonte,MG,28/09/2023,cliente antigo
+ERP-1011,  RIBEIRO EIRELI   ,60.787.669/0001-05,ribeiro.eireli@exemplo.com.br,+55 52 92513-1846,14554-587,Rio de Janeiro,RJ,14/06/2018,N/A
+ERP-1012,Priscila Araújo,69682636450,sem-arroba.com,(83) 93211-6650,88429-606,Fortaleza,CE,2024-08-21,N/A
+ERP-1013,  RAFAEL ARAÚJO   ,658.504.793-17,rafael.araújo@exemplo.com.br,65965335619,09643-610,Fortaleza,CE,07/01/2021,revisar
+ERP-1014,Fábio Barbosa,71605133205,fábio.barbosa@exemplo.com.br,67940441978,83928-935,Rio de Janeiro,RJ,2023-11-05,revisar
+ERP-1015,Almeida ME,07.760.597/0001-11,almeida.me@exemplo.com.br,(54) 93634-6869,62682-542,Manaus,AM,27-01-2023,revisar
+ERP-1016,Ribeiro S/A,23229548000103,ribeiro.sa@exemplo.com.br,42994056008,36439-638,Porto Alegre,RS,2018-06-23,cliente antigo
+ERP-1017,Pereira EIRELI,02839740000141,pereira.eireli@exemplo.com.br,+55 69 91577-8365,,Recife,PE,30/05/2020,N/A
+ERP-1018,João Araújo,111.111.111-11,joão.araújo@exemplo.com.br,(41) 98243-8440,63430-617,Belo Horizonte,MG,07/09/2020,N/A
+ERP-1019,  VANESSA CARVALHO   ,15394572658,vanessa.carvalho@exemplo.com.br,(28) 90396-9491,44678-426,Recife,PE,14-03-2021,
+ERP-1020,Priscila Barbosa,082.987.359-78,priscila.barbosa@exemplo.com.br,-,71732-605,Rio de Janeiro,RJ,29/01/2019,cliente antigo
+ERP-1021,Rafael Pereira,18409182416,rafael.pereira@exemplo.com.br,(24) 95017-8963,19288-727,Porto Alegre,RS,2018-10-03,cliente antigo
+ERP-1022,Barbosa S/A,29.904.080/0001-91,barbosa.sa@exemplo.com.br,95920185436,27456-266,Recife,PE,2020-08-11,
+ERP-1023,Vanessa Gomes,16979854674,vanessa.gomes@exemplo.com.br,(55) 98442-9151,34714-837,Manaus,AM,24/05/2021,
+ERP-1024,Martins S/A,89518817000160,martins.sa@exemplo.com.br,24967707156,26190-838,Manaus,AM,2021-11-07,N/A
+ERP-1025,Natália Araújo,17240414108,natália.araújo@exemplo.com.br,N/A,79245-448,Manaus,AM,2020-01-19,
+ERP-1026,Carla Martins,68501397709,carla.martins@exemplo.com.br,52901331224,41943-231,Belo Horizonte,MG,03-04-2023,cliente antigo
+ERP-1027,Rafael Oliveira,777.446.021-70,rafael.oliveira@exemplo.com.br,(44) 95756-6779,50846-056,Recife,PE,10/02/2018,cliente antigo
+ERP-1028,Araújo EIRELI,41.699.842/0001-60,araújo.eireli@exemplo.com.br,(41) 90826-5112,62733-306,Recife,PE,13-07-2019,
+ERP-1029,Thiago Gomes,96907999676,thiago.gomes@exemplo.com.br,73978324051,39503-822,Belo Horizonte,MG,28-03-2022,cliente antigo
+ERP-1030,Marcos Pereira,327.234.358-06,marcos.pereira@exemplo.com.br,+55 54 97060-7150,89070-880,Rio de Janeiro,RJ,23-03-2022,N/A
+ERP-1031,Heitor Carvalho,27193169203,heitor.carvalho@exemplo.com.br,19981434947,95342-392,Recife,PE,18-07-2021,cliente antigo
+ERP-1032,Rafael Souza,657.111.728-24,rafael.souza@exemplo.com.br,+55 53 99682-0504,20575-662,Salvador,BA,12/07/2023,cliente antigo
+ERP-1033,  PRISCILA GOMES   ,77936910247,@dominio.com,(28) 97014-2924,04575-238,Rio de Janeiro,RJ,09-07-2022,revisar
+ERP-1034,João Nununes,111.111.111-11,joão.nununes@exemplo.com.br,N/A,35641-616,Curitiba,PR,21/09/2021,cliente antigo
+ERP-1035,William Oliveira,111.111.111-11,william.oliveira@exemplo.com.br,+55 39 99508-7020,35996-148,Salvador,BA,09-06-2023,revisar
+ERP-1036,Sônia Santos,96075663436,sônia.santos@exemplo.com.br,+55 45 98006-7353,06343-452,São Paulo,SP,27/03/2021,revisar
+ERP-1037,Heitor Barbosa,401.775.778-27,heitor.barbosa@exemplo.com.br,N/A,03703-381,Rio de Janeiro,RJ,2020-04-24,revisar
+ERP-1038,Marcos Martins,573.164.577-91,marcos.martins@exemplo.com.br,(55) 90379-4062,28945-882,Porto Alegre,RS,09-08-2023,revisar
+ERP-1039,Heitor Nununes,40698335287,heitor.nununes@exemplo.com.br,+55 91 93773-9873,20906-359,Porto Alegre,RS,27/12/2021,cliente antigo
+ERP-1040,Araújo EIRELI,61357874000195,araújo.eireli@exemplo.com.br,68953619482,,Belo Horizonte,MG,28/03/2019,N/A
+ERP-1041,Elaine Gomes,667.923.306-20,elaine.gomes@exemplo.com.br,N/A,78268-411,Belo Horizonte,MG,02/08/2021,cliente antigo
+ERP-1042,Isabela Souza,84282410400,isabela.souza@exemplo.com.br,(84) 98066-3699,87238-901,Rio de Janeiro,RJ,2024-06-01,
+ERP-1043,Otávio Carvalho,111.111.111-11,otávio.carvalho@exemplo.com.br,63954646547,90713-306,Curitiba,PR,04/09/2023,cliente antigo
+ERP-1044,  NATÁLIA MARTINS   ,629.087.779-83,natália.martins@exemplo.com.br,+55 21 91769-8418,25319-469,Fortaleza,CE,20/02/2021,N/A
+ERP-1045,Ana Martins,59384487945,ana.martins@exemplo.com.br,(15) 95340-6130,23150-421,Rio de Janeiro,RJ,29/08/2019,cliente antigo
+ERP-1046,Carla Carvalho,080.628.117-00,carla.carvalho@exemplo.com.br,42990214340,,Fortaleza,CE,29/07/2020,cliente antigo
+ERP-1047,Araújo LTDA,85724187000129,araújo.ltda@exemplo.com.br,+55 37 94068-3462,76508-290,São Paulo,SP,27-03-2023,cliente antigo
+ERP-1048,Sônia Martins,880.056.035-09,sônia.martins@exemplo.com.br,+55 76 90513-4181,21437-518,São Paulo,SP,12/09/2020,cliente antigo
+ERP-1049,Fábio Carvalho,673.915.315-96,fábio.carvalho@exemplo.com.br,50973601206,57766-597,Belo Horizonte,MG,2024-08-31,
+ERP-1000-DUP,Almeida S/A,98.949.230/0001-04,ALMEIDA.SA@EXEMPLO.COM.BR,+55 87 99150-3689,69046-522,Manaus,AM,27-10-2019,
+ERP-1001-DUP,Nununes Ltda,59211226000184,NUNUNES.LTDA@EXEMPLO.COM.BR,50923117298,41267-342,Curitiba,PR,27/11/2019,
+ERP-1002-DUP,Fábio Carvalho,49765051468,USUARIO@,+55 42 91029-5094,01637-227,Manaus,AM,2023-03-13,N/A
+ERP-1003-DUP,Silva S/A,18030155000136,SILVA.SA@EXEMPLO.COM.BR,31991873719,36777-058,Fortaleza,CE,2021-12-05,
+ERP-1004-DUP,Souza Eireli,111.111.111-11,SOUZA.EIRELI@EXEMPLO.COM.BR,25989965226,21041-622,Curitiba,PR,2023-07-31,cliente antigo

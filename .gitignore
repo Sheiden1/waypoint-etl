@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Ferramentas
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Ambiente e segredos
+.env
+*.local
+
+# Dados sensíveis: uploads e exportações nunca vão para o versionamento
+uploads/
+exports/
+tmp/
+
+# IDE / SO
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Configuração local do Claude Code (não versionar)
+.claude/settings.local.json

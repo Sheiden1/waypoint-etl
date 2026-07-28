@@ -1,0 +1,183 @@
+"""Registros sintéticos de clientes no estilo de um ERP legado.
+
+Gera dados propositalmente "sujos" para exercitar o pipeline de limpeza,
+validação e deduplicação: máscaras variadas, datas em três formatos, duplicatas,
+documentos e e-mails inválidos, campos vazios e ruído textual.
+
+Os cabeçalhos usam nomes em português no estilo legado, compatíveis com o
+exemplo de mapeamento De/Para do CLAUDE.md.
+"""
+
+from __future__ import annotations
+
+import csv
+from pathlib import Path
+from random import Random
+
+from .documents import generate_cnpj, generate_cpf
+
+# Cabeçalhos legados (origem). Não confundir com o schema canônico de destino.
+CSV_HEADERS = [
+    "Código",
+    "Nome Cliente",
+    "CPF_CNPJ",
+    "Correio Eletrônico",
+    "Fone Principal",
+    "CEP",
+    "Cidade",
+    "UF",
+    "Data Cadastro",
+    "Observação Interna Antiga",
+]
+
+_FIRST_NAMES = [
+    "Ana", "Bruno", "Carla", "Diego", "Elaine", "Fábio", "Gabriela",
+    "Heitor", "Isabela", "João", "Larissa", "Marcos", "Natália",
+    "Otávio", "Priscila", "Rafael", "Sônia", "Thiago", "Vanessa", "William",
+]
+_LAST_NAMES = [
+    "Silva", "Souza", "Oliveira", "Santos", "Pereira", "Costa", "Almeida",
+    "Nununes", "Carvalho", "Ribeiro", "Gomes", "Martins", "Araújo", "Barbosa",
+]
+_COMPANY_SUFFIXES = ["ME", "LTDA", "EIRELI", "S/A"]
+_CITIES = [
+    ("São Paulo", "SP"), ("Rio de Janeiro", "RJ"), ("Belo Horizonte", "MG"),
+    ("Curitiba", "PR"), ("Porto Alegre", "RS"), ("Salvador", "BA"),
+    ("Recife", "PE"), ("Fortaleza", "CE"), ("Manaus", "AM"), ("Goiânia", "GO"),
+]
+_DATE_FORMATS = ["%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"]
+
+
+def _mask_cpf(digits: str, rng: Random) -> str:
+    """Aplica (ou não) máscara a um CPF, para variar os formatos de origem."""
+    if rng.random() < 0.5:
+        return f"{digits[:3]}.{digits[3:6]}.{digits[6:9]}-{digits[9:]}"
+    return digits
+
+
+def _mask_cnpj(digits: str, rng: Random) -> str:
+    """Aplica (ou não) máscara a um CNPJ."""
+    if rng.random() < 0.5:
+        return f"{digits[:2]}.{digits[2:5]}.{digits[5:8]}/{digits[8:12]}-{digits[12:]}"
+    return digits
+
+
+def _phone(rng: Random) -> str:
+    """Gera um telefone brasileiro com máscara variada."""
+    ddd = rng.randint(11, 99)
+    number = rng.randint(90000_0000, 99999_9999)
+    style = rng.randint(0, 2)
+    if style == 0:
+        return f"({ddd}) {str(number)[:5]}-{str(number)[5:]}"
+    if style == 1:
+        return f"+55 {ddd} {str(number)[:5]}-{str(number)[5:]}"
+    return f"{ddd}{number}"
+
+
+def _format_date(rng: Random) -> str:
+    """Gera uma data de cadastro em um dos três formatos suportados."""
+    from datetime import date, timedelta
+
+    start = date(2018, 1, 1)
+    day = start + timedelta(days=rng.randint(0, 2500))
+    return day.strftime(rng.choice(_DATE_FORMATS))
+
+
+def generate_customer_rows(
+    *, seed: int = 20240101, count: int = 50
+) -> list[dict[str, str]]:
+    """Gera registros de clientes sintéticos e determinísticos.
+
+    Inclui, além dos ``count`` clientes principais: 5 duplicatas, 5 documentos
+    inválidos, 3 e-mails inválidos, campos vazios e ruído textual.
+    """
+    rng = Random(seed)
+    rows: list[dict[str, str]] = []
+
+    for i in range(count):
+        is_company = rng.random() < 0.35
+        if is_company:
+            name = f"{rng.choice(_LAST_NAMES)} {rng.choice(_COMPANY_SUFFIXES)}"
+            document = _mask_cnpj(generate_cnpj(rng), rng)
+        else:
+            name = f"{rng.choice(_FIRST_NAMES)} {rng.choice(_LAST_NAMES)}"
+            document = _mask_cpf(generate_cpf(rng), rng)
+
+        city, uf = rng.choice(_CITIES)
+        slug = name.lower().replace(" ", ".").replace("/", "")
+        email = f"{slug}@exemplo.com.br"
+
+        rows.append(
+            {
+                "Código": f"ERP-{1000 + i}",
+                "Nome Cliente": name,
+                "CPF_CNPJ": document,
+                "Correio Eletrônico": email,
+                "Fone Principal": _phone(rng),
+                "CEP": f"{rng.randint(1000, 99999):05d}-{rng.randint(0, 999):03d}",
+                "Cidade": city,
+                "UF": uf,
+                "Data Cadastro": _format_date(rng),
+                "Observação Interna Antiga": rng.choice(
+                    ["", "cliente antigo", "revisar", "N/A"]
+                ),
+            }
+        )
+
+    _inject_noise(rows, rng)
+    _inject_invalid_documents(rows, rng)
+    _inject_invalid_emails(rows, rng)
+    _inject_empty_fields(rows, rng)
+    _append_duplicates(rows, rng)
+    return rows
+
+
+def _inject_noise(rows: list[dict[str, str]], rng: Random) -> None:
+    """Adiciona espaços extras e caracteres especiais a alguns nomes."""
+    for index in rng.sample(range(len(rows)), k=min(6, len(rows))):
+        name = rows[index]["Nome Cliente"]
+        rows[index]["Nome Cliente"] = f"  {name.upper()}   "
+
+
+def _inject_invalid_documents(rows: list[dict[str, str]], rng: Random) -> None:
+    """Corrompe 5 documentos para exercitar a rejeição por dígito verificador."""
+    for index in rng.sample(range(len(rows)), k=min(5, len(rows))):
+        rows[index]["CPF_CNPJ"] = "111.111.111-11"
+
+
+def _inject_invalid_emails(rows: list[dict[str, str]], rng: Random) -> None:
+    """Corrompe 3 e-mails para exercitar a validação de e-mail."""
+    broken = ["sem-arroba.com", "usuario@", "@dominio.com"]
+    for offset, index in enumerate(
+        rng.sample(range(len(rows)), k=min(3, len(rows)))
+    ):
+        rows[index]["Correio Eletrônico"] = broken[offset % len(broken)]
+
+
+def _inject_empty_fields(rows: list[dict[str, str]], rng: Random) -> None:
+    """Esvazia campos opcionais em alguns registros e insere marcadores nulos."""
+    for index in rng.sample(range(len(rows)), k=min(5, len(rows))):
+        rows[index]["Fone Principal"] = rng.choice(["", "-", "N/A"])
+    for index in rng.sample(range(len(rows)), k=min(4, len(rows))):
+        rows[index]["CEP"] = ""
+
+
+def _append_duplicates(rows: list[dict[str, str]], rng: Random) -> None:
+    """Acrescenta 5 duplicatas (mesmo documento, com pequenas variações)."""
+    for source in rows[:5]:
+        duplicate = dict(source)
+        duplicate["Código"] = f"{source['Código']}-DUP"
+        duplicate["Nome Cliente"] = source["Nome Cliente"].strip().title()
+        duplicate["Correio Eletrônico"] = source["Correio Eletrônico"].upper()
+        rows.append(duplicate)
+
+
+def write_customers_csv(path: Path, *, seed: int = 20240101, count: int = 50) -> Path:
+    """Escreve o CSV de clientes legados em ``path`` e retorna o caminho."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = generate_customer_rows(seed=seed, count=count)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=CSV_HEADERS)
+        writer.writeheader()
+        writer.writerows(rows)
+    return path
