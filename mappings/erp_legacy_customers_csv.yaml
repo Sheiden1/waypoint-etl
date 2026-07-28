@@ -1,0 +1,73 @@
+# Template De/Para: clientes exportados em CSV pelo ERP legado fictício.
+#
+# Mesmos campos do template de Excel; muda apenas o bloco `source`, porque o
+# CSV não tem abas nem linha de título antes do cabeçalho. Um template declara
+# um formato: aplicar este a um .xlsx falha com mensagem explícita.
+version: 1
+name: ERP Legado - Clientes (CSV)
+entity: customers
+
+source:
+  type: csv
+  header_row: 1
+
+fields:
+  Código:
+    target: external_id
+    required: false
+    transforms:
+      - clean_text
+
+  Nome Cliente:
+    target: full_name
+    required: true
+    transforms:
+      - clean_text
+      - title_case
+
+  CPF_CNPJ:
+    target: document
+    required: true
+    transforms:
+      - digits_only
+
+  Correio Eletrônico:
+    target: email
+    required: false
+    transforms:
+      - email
+
+  Fone Principal:
+    target: phone
+    required: false
+    transforms:
+      - brazilian_phone
+
+  CEP:
+    target: postal_code
+    required: false
+    transforms:
+      - postal_code
+
+  Cidade:
+    target: city
+    required: false
+    transforms:
+      - clean_text
+      - title_case
+
+  UF:
+    target: state
+    required: false
+    transforms:
+      - uf
+
+  Data Cadastro:
+    target: created_at
+    required: false
+    transforms:
+      - clean_text
+      - brazilian_date
+
+ignored_fields:
+  - Observação Interna Antiga
