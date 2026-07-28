@@ -871,12 +871,24 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 > origem. Planilha de demonstração com duas abas e cabeçalho na linha 2 gerada
 > por `make demo-data`. 124 testes verdes; Ruff e mypy (strict) limpos.
 
-### Dia 3 — Documentos
+### Dia 3 — Documentos ✅ (concluído)
 
-- extrator TXT;
-- extrator DOCX;
-- extrator PDF digital;
-- testes.
+- [x] extrator TXT;
+- [x] extrator DOCX;
+- [x] extrator PDF digital;
+- [x] testes.
+
+> Documentos não têm linhas e colunas, então ganharam contrato próprio:
+> `DocumentText`/`PageText` em `application/dto/document.py` e o port
+> `DocumentExtractor` (o antigo `Extractor` virou `TabularExtractor`).
+> `TxtExtractor` reaproveita a detecção de codificação do CSV; `DocxExtractor`
+> percorre o corpo na ordem original, preservando o par rótulo/valor de
+> parágrafos e tabelas; `PdfExtractor` lê apenas o texto nativo e registra em
+> `empty_pages` as páginas sem camada de texto, deixando a decisão de OCR para
+> o Dia 8. O registry passou a distinguir fontes tabulares de documentos, com
+> mensagens que orientam qual extrator usar. Fixtures TXT, DOCX e PDF digital
+> gerados por `make demo-data`. 167 testes verdes; Ruff e mypy (strict) limpos;
+> cobertura 90%.
 
 ### Dia 4 — De/Para
 
