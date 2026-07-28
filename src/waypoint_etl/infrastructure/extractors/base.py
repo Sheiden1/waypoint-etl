@@ -7,10 +7,14 @@ from collections.abc import Sequence
 from decimal import Decimal
 from pathlib import Path
 
-from ...domain.errors import SourceNotFoundError
+from ...domain.errors import ExtractionError, SourceNotFoundError
 
 # Placeholder para colunas sem cabeçalho, preservando a posição original.
 UNNAMED_COLUMN_TEMPLATE = "coluna_{index}"
+
+# Ordem de tentativa: exportações de ERPs legados costumam vir em UTF-8 (com ou
+# sem BOM) ou em codificações Windows. ``latin-1`` nunca falha e fecha a lista.
+ENCODING_CANDIDATES = ("utf-8-sig", "utf-8", "cp1252", "latin-1")
 
 
 def ensure_readable_file(path: Path) -> None:
@@ -28,6 +32,30 @@ def ensure_readable_file(path: Path) -> None:
             f"O caminho informado não é um arquivo: {path}. "
             "Informe o arquivo, não o diretório."
         )
+
+
+def read_text_file(path: Path, encoding: str | None) -> tuple[str, str]:
+    """Lê um arquivo de texto, devolvendo ``(conteúdo, codificação usada)``.
+
+    Quando ``encoding`` não é informado, tenta ``ENCODING_CANDIDATES`` em ordem.
+    Compartilhado pelos extratores de CSV e TXT.
+    """
+    candidates = (encoding,) if encoding else ENCODING_CANDIDATES
+    last_error: UnicodeDecodeError | None = None
+    for candidate in candidates:
+        try:
+            return path.read_text(encoding=candidate), candidate
+        except UnicodeDecodeError as error:
+            last_error = error
+        except LookupError as error:
+            raise ExtractionError(
+                f"Codificação desconhecida: '{candidate}'. "
+                "Use um nome válido, como 'utf-8' ou 'cp1252'."
+            ) from error
+    raise ExtractionError(
+        f"Não foi possível decodificar '{path.name}'. "
+        "Informe a codificação correta no template De/Para."
+    ) from last_error
 
 
 def coerce_cell(value: object) -> str | None:
@@ -120,10 +148,12 @@ def build_row_mapping(
 
 
 __all__ = [
+    "ENCODING_CANDIDATES",
     "UNNAMED_COLUMN_TEMPLATE",
     "build_row_mapping",
     "coerce_cell",
     "ensure_readable_file",
     "is_blank_row",
     "normalize_headers",
+    "read_text_file",
 ]

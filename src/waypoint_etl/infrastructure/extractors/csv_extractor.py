@@ -19,18 +19,16 @@ from ...application.dto.extraction import (
 from ...domain.enums.source_format import SourceFormat
 from ...domain.errors import EmptySourceError, ExtractionError
 from .base import (
+    ENCODING_CANDIDATES,
     build_row_mapping,
     coerce_cell,
     ensure_readable_file,
     is_blank_row,
     normalize_headers,
+    read_text_file,
 )
 
 SUPPORTED_SUFFIXES = frozenset({".csv"})
-
-# Ordem de tentativa: exportações de ERPs legados costumam vir em UTF-8 (com ou
-# sem BOM) ou em codificações Windows. ``latin-1`` nunca falha e fecha a lista.
-ENCODING_CANDIDATES = ("utf-8-sig", "utf-8", "cp1252", "latin-1")
 
 _SNIFF_DELIMITERS = ",;\t|"
 _SNIFF_BYTES = 8192
@@ -53,7 +51,7 @@ class CsvExtractor:
         ensure_readable_file(path)
 
         warnings: list[str] = []
-        text, encoding = _read_text(path, opts.encoding)
+        text, encoding = read_text_file(path, opts.encoding)
         if opts.encoding is None and encoding != ENCODING_CANDIDATES[0]:
             warnings.append(
                 f"Arquivo lido com a codificação '{encoding}'. "
@@ -84,26 +82,6 @@ class CsvExtractor:
             records=tuple(records),
             warnings=tuple(warnings),
         )
-
-
-def _read_text(path: Path, encoding: str | None) -> tuple[str, str]:
-    """Lê o arquivo como texto, devolvendo ``(conteúdo, codificação usada)``."""
-    candidates = (encoding,) if encoding else ENCODING_CANDIDATES
-    last_error: UnicodeDecodeError | None = None
-    for candidate in candidates:
-        try:
-            return path.read_text(encoding=candidate), candidate
-        except UnicodeDecodeError as error:
-            last_error = error
-        except LookupError as error:
-            raise ExtractionError(
-                f"Codificação desconhecida: '{candidate}'. "
-                "Use um nome válido, como 'utf-8' ou 'cp1252'."
-            ) from error
-    raise ExtractionError(
-        f"Não foi possível decodificar '{path.name}'. "
-        "Informe a codificação correta no template De/Para."
-    ) from last_error
 
 
 def _sniff_delimiter(text: str) -> str:

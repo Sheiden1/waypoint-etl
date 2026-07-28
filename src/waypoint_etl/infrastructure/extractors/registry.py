@@ -1,14 +1,22 @@
-"""Detecção do formato de origem e seleção do extrator correspondente."""
+"""Detecção do formato de origem e seleção do extrator correspondente.
+
+Existem dois tipos de extrator porque existem dois tipos de resultado: fontes
+tabulares devolvem registros; documentos devolvem texto para estruturação
+posterior por Regex.
+"""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from ...application.ports.extractor import Extractor
+from ...application.ports.extractor import DocumentExtractor, TabularExtractor
 from ...domain.enums.source_format import SourceFormat
 from ...domain.errors import UnsupportedFormatError
 from .csv_extractor import CsvExtractor
+from .docx_extractor import DocxExtractor
 from .excel_extractor import ExcelExtractor
+from .pdf_extractor import PdfExtractor
+from .txt_extractor import TxtExtractor
 
 # Formatos declarados no escopo do MVP (seção 4), mesmo os ainda não
 # implementados: a detecção precisa distinguir "não suportado" de "pendente".
@@ -24,10 +32,20 @@ EXTENSION_FORMATS: dict[str, SourceFormat] = {
     ".jpeg": SourceFormat.IMAGE,
 }
 
+TABULAR_FORMATS = frozenset({SourceFormat.CSV, SourceFormat.EXCEL})
+DOCUMENT_FORMATS = frozenset(
+    {SourceFormat.PDF, SourceFormat.DOCX, SourceFormat.TXT, SourceFormat.IMAGE}
+)
 
-def _build_extractors() -> tuple[Extractor, ...]:
-    """Extratores disponíveis, na ordem de tentativa."""
+
+def _tabular_extractors() -> tuple[TabularExtractor, ...]:
+    """Extratores tabulares disponíveis, na ordem de tentativa."""
     return (CsvExtractor(), ExcelExtractor())
+
+
+def _document_extractors() -> tuple[DocumentExtractor, ...]:
+    """Extratores de documento disponíveis, na ordem de tentativa."""
+    return (TxtExtractor(), DocxExtractor(), PdfExtractor())
 
 
 def detect_format(path: Path) -> SourceFormat:
@@ -46,20 +64,54 @@ def detect_format(path: Path) -> SourceFormat:
         ) from None
 
 
-def get_extractor(path: Path) -> Extractor:
-    """Devolve o extrator capaz de ler ``path``.
+def is_tabular(path: Path) -> bool:
+    """Indica se ``path`` é uma fonte tabular (devolve registros diretamente)."""
+    return detect_format(path) in TABULAR_FORMATS
+
+
+def get_tabular_extractor(path: Path) -> TabularExtractor:
+    """Devolve o extrator tabular capaz de ler ``path``."""
+    source_format = detect_format(path)
+    for extractor in _tabular_extractors():
+        if extractor.supports(path):
+            return extractor
+    if source_format in DOCUMENT_FORMATS:
+        raise UnsupportedFormatError(
+            f"'{source_format.value}' é um formato de documento, não tabular. "
+            "Use o extrator de documentos para este arquivo."
+        )
+    raise UnsupportedFormatError(  # pragma: no cover - guarda para novos formatos
+        f"O formato '{source_format.value}' ainda não possui extrator tabular."
+    )
+
+
+def get_document_extractor(path: Path) -> DocumentExtractor:
+    """Devolve o extrator de documentos capaz de ler ``path``.
 
     Formatos previstos no MVP mas ainda não implementados falham com uma
     mensagem explícita, nunca com um resultado simulado.
     """
     source_format = detect_format(path)
-    for extractor in _build_extractors():
+    for extractor in _document_extractors():
         if extractor.supports(path):
             return extractor
+    if source_format in TABULAR_FORMATS:
+        raise UnsupportedFormatError(
+            f"'{source_format.value}' é um formato tabular, não um documento. "
+            "Use o extrator tabular para este arquivo."
+        )
     raise UnsupportedFormatError(
         f"O formato '{source_format.value}' ainda não possui extrator "
         "implementado nesta versão do Waypoint."
     )
 
 
-__all__ = ["EXTENSION_FORMATS", "detect_format", "get_extractor"]
+__all__ = [
+    "DOCUMENT_FORMATS",
+    "EXTENSION_FORMATS",
+    "TABULAR_FORMATS",
+    "detect_format",
+    "get_document_extractor",
+    "get_tabular_extractor",
+    "is_tabular",
+]

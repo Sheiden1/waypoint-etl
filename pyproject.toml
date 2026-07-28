@@ -107,6 +107,9 @@ warn_redundant_casts = true
 disallow_untyped_defs = true
 no_implicit_optional = true
 plugins = ["pydantic.mypy"]
+# O PyMuPDF expõe tipos apenas parcialmente; permitir chamadas não tipadas
+# somente a ele evita afrouxar a checagem no resto do projeto.
+untyped_calls_exclude = ["pymupdf"]
 mypy_path = "src"
 packages = ["waypoint_etl"]
 

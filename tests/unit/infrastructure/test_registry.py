@@ -10,9 +10,14 @@ from waypoint_etl.domain.enums.source_format import SourceFormat
 from waypoint_etl.domain.errors import UnsupportedFormatError
 from waypoint_etl.infrastructure.extractors import (
     CsvExtractor,
+    DocxExtractor,
     ExcelExtractor,
+    PdfExtractor,
+    TxtExtractor,
     detect_format,
-    get_extractor,
+    get_document_extractor,
+    get_tabular_extractor,
+    is_tabular,
 )
 
 
@@ -41,13 +46,39 @@ def test_detect_format_rejects_unknown_extensions(filename: str) -> None:
         detect_format(Path(filename))
 
 
-def test_get_extractor_returns_implementation() -> None:
-    assert isinstance(get_extractor(Path("a.csv")), CsvExtractor)
-    assert isinstance(get_extractor(Path("a.xlsx")), ExcelExtractor)
+@pytest.mark.parametrize(
+    ("filename", "expected"),
+    [("a.csv", True), ("a.xlsx", True), ("a.pdf", False), ("a.txt", False)],
+)
+def test_is_tabular(filename: str, expected: bool) -> None:
+    assert is_tabular(Path(filename)) is expected
 
 
-@pytest.mark.parametrize("filename", ["a.pdf", "a.docx", "a.txt", "a.png"])
-def test_get_extractor_reports_pending_formats_explicitly(filename: str) -> None:
-    """Formatos previstos mas não implementados falham em vez de simular."""
+def test_get_tabular_extractor_returns_implementation() -> None:
+    assert isinstance(get_tabular_extractor(Path("a.csv")), CsvExtractor)
+    assert isinstance(get_tabular_extractor(Path("a.xlsx")), ExcelExtractor)
+
+
+def test_get_document_extractor_returns_implementation() -> None:
+    assert isinstance(get_document_extractor(Path("a.txt")), TxtExtractor)
+    assert isinstance(get_document_extractor(Path("a.docx")), DocxExtractor)
+    assert isinstance(get_document_extractor(Path("a.pdf")), PdfExtractor)
+
+
+@pytest.mark.parametrize("filename", ["a.pdf", "a.docx", "a.txt"])
+def test_tabular_extractor_rejects_documents_with_guidance(filename: str) -> None:
+    with pytest.raises(UnsupportedFormatError, match="não tabular"):
+        get_tabular_extractor(Path(filename))
+
+
+@pytest.mark.parametrize("filename", ["a.csv", "a.xlsx"])
+def test_document_extractor_rejects_tabular_with_guidance(filename: str) -> None:
+    with pytest.raises(UnsupportedFormatError, match="não um documento"):
+        get_document_extractor(Path(filename))
+
+
+@pytest.mark.parametrize("filename", ["a.png", "a.jpg", "a.jpeg"])
+def test_images_are_reported_as_pending_until_ocr(filename: str) -> None:
+    """Imagens só serão lidas no Dia 8; até lá, falham em vez de simular."""
     with pytest.raises(UnsupportedFormatError, match="ainda não possui extrator"):
-        get_extractor(Path(filename))
+        get_document_extractor(Path(filename))

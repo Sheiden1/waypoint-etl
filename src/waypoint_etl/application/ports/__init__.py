@@ -1,5 +1,5 @@
 """Interfaces (ports) implementadas pela infraestrutura."""
 
-from .extractor import Extractor
+from .extractor import DocumentExtractor, TabularExtractor
 
-__all__ = ["Extractor"]
+__all__ = ["DocumentExtractor", "TabularExtractor"]
