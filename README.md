@@ -45,6 +45,7 @@ carregar → auditar.**
 ## Requisitos
 
 - Python 3.12 ou superior.
+- Node.js 22.13 ou superior para a nova interface web.
 - (Opcional) [`uv`](https://github.com/astral-sh/uv) para gerenciar o ambiente.
 
 ## Instalação (desenvolvimento)
@@ -66,6 +67,69 @@ source .venv/bin/activate
 
 pip install -e ".[dev]"
 ```
+
+## Nova interface web
+
+A jornada web usa React, TypeScript e o design system Astryx. As cinco etapas
+funcionais cobrem origem, mapeamento, validação, destino e resultado: o usuário
+inspeciona o arquivo, escolhe um template do catálogo, envia YAML ou monta o
+De/Para visualmente, executa o `dry-run`, baixa os relatórios e, quando há um
+PostgreSQL configurado, pode confirmar a carga de forma explícita.
+
+A interface apresenta a prévia real do pipeline, totais de qualidade, problemas,
+duplicidades, transformações e duração por estágio. Ela também oferece modo
+claro, escuro ou do sistema, densidade confortável ou compacta e preferência de
+movimento. Essas escolhas ficam somente no navegador e não alteram as regras do
+ETL. Temas comunitários usam um contrato TypeScript separado do núcleo.
+
+Instale o frontend uma vez:
+
+```powershell
+npm --prefix web install
+```
+
+Depois, abra dois terminais na raiz do projeto:
+
+```powershell
+# Terminal 1 — API
+uv run uvicorn waypoint_etl.presentation.api.app:app --reload
+
+# Terminal 2 — interface
+npm --prefix web run dev
+```
+
+Acesse `http://localhost:5173`. A documentação interativa da API fica em
+`http://localhost:8000/api/docs`.
+
+Os endpoints de migração recebem novamente o arquivo de origem e o YAML como
+`multipart/form-data`. O `dry-run` usa
+`POST /api/v1/migrations/dry-run`; a carga usa
+`POST /api/v1/migrations/load-postgres` com os campos `file`, `mapping`,
+`entity` e `confirm=true`. Sem confirmação, a API recusa a escrita; sem
+`DATABASE_URL`, todo o fluxo de inspeção, validação e download continua
+disponível, mas a carga aparece como indisponível.
+
+Cada validação ou carga publica somente `accepted.csv`, `rejected.xlsx`,
+`duplicates.csv` e `audit-report.json` para download pelo `run_id`. Esses
+relatórios são temporários: o TTL padrão é de 1.800 segundos e pode ser ajustado
+por `ARTIFACT_TTL_SECONDS`. O upload e o YAML são apagados ao fim da requisição;
+os relatórios também desaparecem ao vencer o TTL ou reiniciar a API. Faça os
+downloads na mesma jornada.
+
+Para verificar a interface:
+
+```powershell
+npm --prefix web run lint
+npm --prefix web run test:run
+npm --prefix web run build
+```
+
+As Fases 1–5 estão funcionais. A Fase 6 possui configuração reproduzível para
+Vercel Hobby, Render Free e Neon Free opcional, mas nenhum deploy externo deste
+repositório foi executado. Consulte o
+[guia de deploy gratuito](docs/deployment.md) para publicar e rodar o smoke test,
+e o [roadmap da plataforma web](docs/web-platform-roadmap.md) para o estado de
+cada fase.
 
 ## Início rápido com Docker
 
@@ -99,6 +163,10 @@ Com `make` (Linux/macOS):
 | `make format`    | formata o código com Ruff              |
 | `make demo-data` | gera os dados sintéticos de demonstração |
 | `make dev`       | inicia a interface Streamlit             |
+| `make api`       | inicia a API FastAPI                       |
+| `make web`       | inicia a nova interface React              |
+| `make web-test`  | testa a nova interface                     |
+| `make web-build` | gera o build do frontend                   |
 | `make docker-up` | inicia aplicação e PostgreSQL             |
 | `make docker-down` | encerra os containers                   |
 
@@ -111,6 +179,8 @@ python -m mypy
 python -m ruff format .
 python -m waypoint_etl.demo
 uv run streamlit run src/waypoint_etl/presentation/streamlit/app.py
+uv run uvicorn waypoint_etl.presentation.api.app:app --reload
+npm --prefix web run dev
 docker compose up --build
 ```
 
@@ -225,15 +295,17 @@ Consulte o [guia completo de mapeamento](docs/mapping-guide.md).
 
 ```mermaid
 flowchart LR
-    UI["CLI / Streamlit"] --> APP["Casos de uso"]
+    CLASSIC["CLI / Streamlit"] --> APP["Casos de uso"]
+    WEB["React + Astryx"] --> API["FastAPI"]
+    API --> APP
     APP --> PIPE["Pipeline ETL"]
     PIPE --> DOMAIN["Domínio"]
     APP --> INFRA["Extração · OCR · PostgreSQL · relatórios"]
 ```
 
 O projeto é um monólito modular em camadas. O domínio não depende de interface,
-banco ou OCR; Streamlit e CLI apenas montam parâmetros e apresentam os mesmos
-objetos de resultado. Veja [docs/architecture.md](docs/architecture.md).
+banco ou OCR; CLI, Streamlit e FastAPI apenas montam parâmetros e apresentam os
+mesmos objetos de resultado. Veja [docs/architecture.md](docs/architecture.md).
 
 ## Requisitos externos
 

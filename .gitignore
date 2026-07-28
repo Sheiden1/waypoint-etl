@@ -43,5 +43,10 @@ samples/input/*.jpeg
 .DS_Store
 Thumbs.db
 
+# Frontend
+web/node_modules/
+web/dist/
+web/coverage/
+
 # Configuração local do Claude Code (não versionar)
 .claude/settings.local.json

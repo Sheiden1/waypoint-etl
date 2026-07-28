@@ -9,19 +9,14 @@ Assim, a interface continua fina e toda regra do pipeline permanece em
 from __future__ import annotations
 
 import hashlib
-import tempfile
-from collections.abc import Iterator, Mapping
-from contextlib import contextmanager
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
-from pathlib import Path, PurePath
+from pathlib import Path
 
 import yaml
 from sqlalchemy import Engine
 
-from ...application.dto.extraction import ExtractionOptions
-from ...application.dto.results import MigrationResult, SourcePreview
-from ...application.ports.ocr import OcrEngine
-from ...application.use_cases.inspect_source import inspect_source
+from ...application.dto.results import MigrationResult
 from ...application.use_cases.run_migration import MigrationRequest, run_migration
 from ...domain.enums.entity_type import EntityType
 from ...domain.enums.source_format import SourceFormat
@@ -30,16 +25,12 @@ from ...domain.value_objects.document import mask_document
 from ...pipeline.mappers.loader import load_mapping, parse_mapping
 from ...pipeline.mappers.schema import MappingTemplate
 from ...pipeline.validators.result import ValidatedRecord
-
-SUPPORTED_UPLOAD_EXTENSIONS: tuple[str, ...] = (
-    "csv",
-    "xlsx",
-    "pdf",
-    "docx",
-    "txt",
-    "png",
-    "jpg",
-    "jpeg",
+from ..uploads import (
+    SUPPORTED_UPLOAD_EXTENSIONS,
+    inspect_uploaded_source,
+    materialized_upload,
+    safe_upload_name,
+    upload_digest,
 )
 
 ENTITY_LABELS: Mapping[EntityType, str] = {
@@ -91,34 +82,6 @@ class MappingSource:
         return hashlib.sha256(content).hexdigest()
 
 
-def safe_upload_name(name: str, *, fallback: str = "upload.bin") -> str:
-    """Remove qualquer diretório informado pelo navegador."""
-    normalized = name.replace("\\", "/")
-    candidate = PurePath(normalized).name.strip()
-    return candidate or fallback
-
-
-def upload_digest(name: str, content: bytes) -> str:
-    """Identifica o upload sem persistir seu conteúdo."""
-    digest = hashlib.sha256()
-    digest.update(safe_upload_name(name).encode("utf-8"))
-    digest.update(b"\0")
-    digest.update(content)
-    return digest.hexdigest()
-
-
-def inspect_uploaded_source(
-    name: str,
-    content: bytes,
-    *,
-    options: ExtractionOptions | None = None,
-    ocr_engine: OcrEngine | None = None,
-) -> SourcePreview:
-    """Inspeciona um upload e remove o temporário ao terminar."""
-    with _materialized_upload(name, content) as source:
-        return inspect_source(source, options=options, ocr_engine=ocr_engine)
-
-
 def run_uploaded_migration(
     *,
     source_name: str,
@@ -130,7 +93,7 @@ def run_uploaded_migration(
     engine: Engine | None = None,
 ) -> MigrationResult:
     """Executa o mesmo caso de uso da CLI sobre arquivos enviados pela tela."""
-    with _materialized_upload(source_name, source_content) as source:
+    with materialized_upload(source_name, source_content) as source:
         if mapping.path is not None:
             return run_migration(
                 MigrationRequest(
@@ -144,7 +107,7 @@ def run_uploaded_migration(
             )
 
         assert mapping.content is not None
-        with _materialized_upload(
+        with materialized_upload(
             safe_upload_name(mapping.name, fallback="mapping.yaml"),
             mapping.content,
         ) as mapping_path:
@@ -296,15 +259,6 @@ def duplicate_rows(result: MigrationResult) -> list[dict[str, object]]:
             }
         )
     return rows
-
-
-@contextmanager
-def _materialized_upload(name: str, content: bytes) -> Iterator[Path]:
-    """Materializa um upload em diretório isolado e autodestrutivo."""
-    with tempfile.TemporaryDirectory(prefix="waypoint-upload-") as temporary:
-        path = Path(temporary) / safe_upload_name(name)
-        path.write_bytes(content)
-        yield path
 
 
 __all__ = [

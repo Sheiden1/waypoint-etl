@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     tesseract_cmd: str | None = None
     ocr_language: str = "por"
     export_dir: Path = Path("./exports")
+    web_origins: str = "http://localhost:5173"
+    artifact_ttl_seconds: int = Field(default=1800, ge=60, le=86_400)
 
     @property
     def database_available(self) -> bool:
@@ -42,6 +44,13 @@ class Settings(BaseSettings):
         A carga real para o PostgreSQL só deve ser tentada quando ``True``.
         """
         return bool(self.database_url)
+
+    @property
+    def allowed_web_origins(self) -> tuple[str, ...]:
+        """Origens autorizadas a chamar a API pelo navegador."""
+        return tuple(
+            origin.strip() for origin in self.web_origins.split(",") if origin.strip()
+        )
 
 
 @lru_cache(maxsize=1)

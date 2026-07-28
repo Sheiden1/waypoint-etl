@@ -1,0 +1,83 @@
+.waypoint-preferences-dialog {
+  max-width: calc(100vw - 32px);
+}
+
+.waypoint-preferences-fields {
+  display: grid;
+  gap: var(--spacing-6);
+}
+
+.waypoint-preferences-fields > p,
+.waypoint-preferences-field h3,
+.waypoint-preferences-field p {
+  margin: 0;
+}
+
+.waypoint-preferences-field {
+  display: grid;
+  gap: var(--spacing-3);
+}
+
+.waypoint-preferences-field > div:first-child {
+  display: grid;
+  gap: var(--spacing-1);
+}
+
+.waypoint-preferences-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+}
+
+:root[data-waypoint-density="compact"] .app-content {
+  padding-block: 48px 64px;
+}
+
+:root[data-waypoint-density="compact"] .journey-steps {
+  margin-block: 40px 20px;
+}
+
+:root[data-waypoint-density="compact"] .workspace {
+  gap: 16px;
+}
+
+:root[data-waypoint-density="compact"] .workspace-primary,
+:root[data-waypoint-density="compact"] .workspace-aside {
+  gap: 16px;
+}
+
+:root[data-waypoint-density="compact"] .section-heading {
+  margin-bottom: 20px;
+}
+
+:root[data-waypoint-density="compact"] .primary-action {
+  margin-top: 20px;
+}
+
+:root[data-waypoint-density="compact"] .waypoint-preferences-fields {
+  gap: var(--spacing-4);
+}
+
+:root[data-waypoint-motion="reduced"] {
+  scroll-behavior: auto;
+}
+
+:root[data-waypoint-motion="reduced"] *,
+:root[data-waypoint-motion="reduced"] *::before,
+:root[data-waypoint-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}
+
+@media (max-width: 560px) {
+  .waypoint-preferences-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .waypoint-preferences-actions .astryx-button {
+    width: 100%;
+  }
+}

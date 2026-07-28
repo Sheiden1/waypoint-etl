@@ -1080,6 +1080,22 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 
 ## 24. Roadmap posterior
 
+### Jornada web `v0.2.0`
+
+A arquitetura, os contratos e os critérios de aceite da nova interface estão em
+`docs/web-platform-roadmap.md`. A implementação usa React, Vite, TypeScript,
+Astryx e uma API FastAPI fina sobre os casos de uso existentes. O Streamlit
+permanece como interface clássica até o fluxo web alcançar paridade funcional.
+
+Princípios adicionais desta jornada:
+
+- a plataforma é open-source, gratuita, não comercial e personalizável;
+- Astryx fornece componentes, enquanto o tema e as composições pertencem ao
+  Waypoint;
+- uploads continuam efêmeros e sem retenção padrão;
+- nenhuma rota HTTP pode duplicar regra do pipeline;
+- funcionalidades planejadas não aparecem como controles ativos.
+
 ### `v0.2.0`
 
 - histórico visual de execuções;

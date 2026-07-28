@@ -13,5 +13,6 @@ uploads
 tmp
 samples
 tests
+web
 .env
 *.local

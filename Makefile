@@ -1,4 +1,4 @@
-.PHONY: install dev test lint typecheck format demo-data docker-up docker-down
+.PHONY: install dev api web web-install web-build web-test test lint typecheck format demo-data docker-up docker-down
 
 # Preferimos uv quando disponível; caso contrário, use o venv/pip (ver README).
 PYTHON ?= python
@@ -8,6 +8,21 @@ install:
 
 dev:
 	uv run streamlit run src/waypoint_etl/presentation/streamlit/app.py
+
+api:
+	uv run uvicorn waypoint_etl.presentation.api.app:app --reload
+
+web:
+	npm --prefix web run dev
+
+web-install:
+	npm --prefix web install
+
+web-build:
+	npm --prefix web run build
+
+web-test:
+	npm --prefix web run test:run
 
 test:
 	$(PYTHON) -m pytest

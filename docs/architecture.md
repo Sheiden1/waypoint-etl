@@ -1,11 +1,11 @@
 # Arquitetura
 
-O Waypoint usa um monólito modular em camadas. CLI e Streamlit são adaptadores
-de apresentação: ambos chamam os mesmos casos de uso.
+O Waypoint usa um monólito modular em camadas. CLI, Streamlit e a API web são
+adaptadores de apresentação: todos chamam os mesmos casos de uso.
 
 ```mermaid
 flowchart LR
-    UI["CLI / Streamlit"] --> APP["application: casos de uso"]
+    UI["CLI / Streamlit / API web"] --> APP["application: casos de uso"]
     APP --> PIPE["pipeline ETL"]
     PIPE --> DOMAIN["domain: entidades e regras"]
     APP --> INFRA["infrastructure: extração, OCR, banco e relatórios"]
@@ -60,3 +60,10 @@ As tabelas de destino são `customers`, `contacts` e `invoices`. Auditoria usa
 - aproximações geram alertas, nunca merge automático;
 - documentos enviados não têm armazenamento permanente;
 - OCR é um fallback explícito, sempre seguido de validação.
+
+## Jornada web
+
+A evolução para React, Astryx e FastAPI está registrada em
+[`web-platform-roadmap.md`](web-platform-roadmap.md). A nova interface é uma
+borda adicional do mesmo monólito modular; ela não transforma o pipeline em
+microsserviços nem remove a CLI ou o Streamlit durante a transição.

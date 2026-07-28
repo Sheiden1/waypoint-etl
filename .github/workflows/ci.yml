@@ -11,6 +11,38 @@ permissions:
   contents: read
 
 jobs:
+  web-quality:
+    name: Interface web
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v6
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Instalar dependências
+        working-directory: web
+        run: npm ci
+
+      - name: Lint
+        working-directory: web
+        run: npm run lint
+
+      - name: Testes
+        working-directory: web
+        run: npm run test:run
+
+      - name: Build
+        working-directory: web
+        run: npm run build
+
   quality:
     name: Testes e qualidade
     runs-on: ubuntu-latest
@@ -69,7 +101,7 @@ jobs:
     name: Docker Compose
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: quality
+    needs: [quality, web-quality]
 
     steps:
       - name: Baixar o repositório
