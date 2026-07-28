@@ -1,0 +1,102 @@
+RELATORIO DE CLIENTES - ERP LEGADO
+--------------------------------------------------------------
+Código: ERP-1000
+Nome:   ALMEIDA S/A
+CPF/CNPJ: 98.949.230/0001-04
+E-mail: almeida.sa@exemplo.com.br
+Telefone: N/A
+CEP:
+Cidade: Manaus
+UF: AM
+Data de Cadastro: 27-10-2019
+--------------------------------------------------------------
+Código: ERP-1001
+Nome: Nununes LTDA
+CPF/CNPJ: 59211226000184
+E-mail: nununes.ltda@exemplo.com.br
+Telefone:
+CEP: 41267-342
+Cidade: Curitiba
+UF: PR
+Data de Cadastro: 27/11/2019
+--------------------------------------------------------------
+Código: ERP-1002
+Nome:   FÁBIO CARVALHO
+CPF/CNPJ: 49765051468
+E-mail: usuario@
+Telefone: +55 42 91029-5094
+CEP: 01637-227
+Cidade: Manaus
+UF: AM
+Data de Cadastro: 2023-03-13
+--------------------------------------------------------------
+Código: ERP-1003
+Nome:   SILVA S/A
+CPF/CNPJ: 111.111.111-11
+E-mail: silva.sa@exemplo.com.br
+Telefone: 31991873719
+CEP: 36777-058
+Cidade: Fortaleza
+UF: CE
+Data de Cadastro: 2021-12-05
+--------------------------------------------------------------
+Código: ERP-1004
+Nome:   SOUZA EIRELI
+CPF/CNPJ: 111.111.111-11
+E-mail: souza.eireli@exemplo.com.br
+Telefone: N/A
+CEP: 21041-622
+Cidade: Curitiba
+UF: PR
+Data de Cadastro: 2023-07-31
+--------------------------------------------------------------
+Código: ERP-1005
+Nome: João Martins
+CPF/CNPJ: 302.760.189-07
+E-mail: joão.martins@exemplo.com.br
+Telefone: 54904420259
+CEP:
+Cidade: Curitiba
+UF: PR
+Data de Cadastro: 03/05/2024
+--------------------------------------------------------------
+Código: ERP-1006
+Nome:   RIBEIRO LTDA
+CPF/CNPJ: 111.111.111-11
+E-mail: ribeiro.ltda@exemplo.com.br
+Telefone: 56967229800
+CEP:
+Cidade: Manaus
+UF: AM
+Data de Cadastro: 13-12-2021
+--------------------------------------------------------------
+Código: ERP-1007
+Nome:   BRUNO ALMEIDA
+CPF/CNPJ: 111.111.111-11
+E-mail: @dominio.com
+Telefone: N/A
+CEP: 09327-900
+Cidade: Manaus
+UF: AM
+Data de Cadastro: 17-04-2022
+--------------------------------------------------------------
+Código: ERP-1008
+Nome: João Nununes
+CPF/CNPJ: 92451724307
+E-mail: sem-arroba.com
+Telefone:
+CEP: 42019-125
+Cidade: Recife
+UF: PE
+Data de Cadastro: 05-03-2020
+--------------------------------------------------------------
+Código: ERP-1009
+Nome: Natália Barbosa
+CPF/CNPJ: 111.111.111-11
+E-mail: natália.barbosa@exemplo.com.br
+Telefone: +55 20 93957-5360
+CEP:
+Cidade: Rio de Janeiro
+UF: RJ
+Data de Cadastro: 05/01/2020
+--------------------------------------------------------------

@@ -13,6 +13,11 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from .document_files import (
+    write_customer_form_docx,
+    write_customer_form_pdf,
+    write_customers_txt,
+)
 from .synthetic import write_customers_csv, write_legacy_xlsx
 
 
@@ -22,6 +27,9 @@ def main(argv: list[str] | None = None) -> int:
     targets = [
         write_customers_csv(base / "clientes_legado.csv"),
         write_legacy_xlsx(base / "clientes_legado.xlsx"),
+        write_customers_txt(base / "clientes_legado.txt"),
+        write_customer_form_docx(base / "ficha_cadastral.docx"),
+        write_customer_form_pdf(base / "ficha_cadastral.pdf"),
     ]
     # Saída de script utilitário (fora do núcleo da aplicação).
     for target in targets:

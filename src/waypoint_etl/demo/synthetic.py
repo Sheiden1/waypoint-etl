@@ -11,12 +11,19 @@ exemplo de mapeamento De/Para do CLAUDE.md.
 from __future__ import annotations
 
 import csv
+from datetime import datetime
 from pathlib import Path
 from random import Random
 
 from openpyxl import Workbook
 
 from .documents import generate_cnpj, generate_cpf
+
+# Data fixa gravada nos metadados dos arquivos gerados, para que o conteúdo não
+# dependa do momento da execução. Os containers .xlsx/.docx ainda gravam a data
+# de modificação de cada entrada do ZIP, por isso os binários não são
+# versionados (ver .gitignore).
+FIXTURE_TIMESTAMP = datetime(2024, 1, 1, 12, 0, 0)
 
 # Cabeçalhos legados (origem). Não confundir com o schema canônico de destino.
 CSV_HEADERS = [
@@ -246,6 +253,8 @@ def write_legacy_xlsx(path: Path, *, seed: int = 20240101, count: int = 50) -> P
     contact_rows = generate_contact_rows(customer_rows, seed=seed)
 
     workbook = Workbook()
+    workbook.properties.created = FIXTURE_TIMESTAMP
+    workbook.properties.modified = FIXTURE_TIMESTAMP
     default_sheet = workbook.active
     if default_sheet is not None:
         workbook.remove(default_sheet)
