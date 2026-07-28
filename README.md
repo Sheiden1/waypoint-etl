@@ -7,9 +7,6 @@ sistemas ERP e CRM legados. É uma demonstração técnica e **educacional**: n�
 uma plataforma pronta para tratamento de dados reais em produção. O uso com
 dados reais exige avaliação própria de segurança, infraestrutura e LGPD.
 
-> Projeto independente, sem qualquer vínculo com a HashiCorp ou outras
-> organizações que utilizem o nome *Waypoint*. Os identificadores técnicos usam
-> `waypoint-etl` para evitar ambiguidade.
 
 ## O problema
 
@@ -23,7 +20,7 @@ carregar → auditar.**
 
 ## Estado atual
 
-Em desenvolvimento rumo à `v0.1.0`. A **fundação** (Dia 1) já contempla:
+Em desenvolvimento rumo à `v0.1.0`.
 
 - estrutura do projeto em camadas (`domain`, `application`, `infrastructure`,
   `pipeline`, `presentation`);
@@ -31,8 +28,6 @@ Em desenvolvimento rumo à `v0.1.0`. A **fundação** (Dia 1) já contempla:
 - núcleo de domínio: entidades canônicas (`Customer`, `Contact`, `Invoice`),
   enums, value objects e validação de dígitos verificadores de CPF/CNPJ;
 - gerador de dados sintéticos de demonstração.
-
-Consulte o `CLAUDE.md` para o plano completo de implementação.
 
 ## Requisitos
 
