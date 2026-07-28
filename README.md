@@ -97,16 +97,54 @@ pessoal real é usado ou versionado.
 Os arquivos binários (`.xlsx`, `.docx` e `.pdf`) não são versionados — gere-os
 com `make demo-data` após clonar o repositório.
 
+## Uso pela CLI
+
+Inspecionar um arquivo antes de migrar:
+
+```bash
+uv run waypoint-etl inspect samples/input/clientes_legado.xlsx --sheet Clientes --header-row 2
+```
+
+Executar a migração em `dry-run` (padrão — nada é gravado no banco):
+
+```bash
+uv run waypoint-etl migrate \
+  --input samples/input/clientes_legado.xlsx \
+  --mapping mappings/erp_legacy_customers.yaml \
+  --output ./exports
+```
+
+Cada execução gera `exports/<run_id>/` com os quatro artefatos de auditoria:
+
+| Arquivo             | Conteúdo                                              |
+| ------------------- | ----------------------------------------------------- |
+| `accepted.csv`      | registros válidos, no schema canônico                  |
+| `rejected.xlsx`     | uma linha por problema, com os valores de origem       |
+| `duplicates.csv`    | duplicatas exatas e suspeitas                          |
+| `audit-report.json` | metadados, totais, duração por estágio e alertas       |
+
+O comando sai com código `1` quando há registros rejeitados, o que permite usá-lo
+em verificação automatizada. Para efetivar a carga no PostgreSQL:
+
+```bash
+uv run waypoint-etl migrate ... --no-dry-run --load-postgres
+```
+
 ## Mapeamento De/Para
 
 O mapeamento entre as colunas de origem e o schema canônico é declarado em YAML
 e versionado em `mappings/`:
 
-| Template                       | Entidade    |
-| ------------------------------ | ----------- |
-| `erp_legacy_customers.yaml`    | `customers` |
-| `erp_legacy_contacts.yaml`     | `contacts`  |
-| `erp_legacy_invoices.yaml`     | `invoices`  |
+| Template                        | Entidade    | Origem  |
+| ------------------------------- | ----------- | ------- |
+| `erp_legacy_customers.yaml`     | `customers` | Excel   |
+| `erp_legacy_customers_csv.yaml` | `customers` | CSV     |
+| `erp_legacy_contacts.yaml`      | `contacts`  | Excel   |
+| `erp_legacy_invoices.yaml`      | `invoices`  | CSV     |
+
+Um template declara o formato da origem: aplicá-lo a outro formato falha com
+mensagem explícita, porque o `header_row` de uma planilha desalinharia a leitura
+de um CSV.
 
 O bloco `source` diz como ler o arquivo (aba, linha do cabeçalho, delimitador) e
 cada campo declara o destino canônico e as transformações aplicadas:

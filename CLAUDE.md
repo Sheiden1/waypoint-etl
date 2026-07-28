@@ -986,12 +986,27 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 > ambiente. `tests/integration/test_ocr_tesseract.py` cobre esse caminho e é
 > pulado automaticamente. A seção 26 exige rodá-lo antes da release.
 
-### Dia 9 — CLI
+### Dia 9 — CLI ✅ (concluído)
 
-- `inspect`;
-- `migrate`;
-- `dry-run`;
-- exportações.
+- [x] `inspect`;
+- [x] `migrate`;
+- [x] `dry-run`;
+- [x] exportações.
+
+> O trabalho real foi criar os **casos de uso** (`inspect_source` e
+> `run_migration`): a CLI só monta parâmetros e apresenta o `MigrationResult`,
+> então o Streamlit do Dia 10 consome exatamente o mesmo núcleo (seção 5).
+> `StageTimer` mede os seis estágios do pipeline e o `audit-report.json` é
+> escrito **depois** que a exportação fecha, para registrar a própria duração.
+> Os quatro artefatos da seção 16 saem em `exports/<run_id>/`. `migrate` sai com
+> código 1 quando há rejeitados, permitindo uso em verificação automatizada.
+>
+> Três defeitos apareceram ao rodar a CLI de verdade e foram corrigidos:
+> `title_case` destruía formas jurídicas ("ALMEIDA S/A" virava "Almeida S/a");
+> a ausência de `DATABASE_URL` vazava stack trace em vez de mensagem; e aplicar
+> um template de Excel a um CSV falhava com "coluna não encontrada" em vez de
+> apontar a divergência de formato. Daí também nasceu
+> `mappings/erp_legacy_customers_csv.yaml`.
 
 ### Dia 10 — Streamlit
 
