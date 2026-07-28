@@ -59,7 +59,10 @@ def test_scanned_pdf_falls_back_to_ocr(tmp_path: Path) -> None:
 
 def test_ocr_recovers_a_document_number(tmp_path: Path) -> None:
     """O que importa não é o texto perfeito, e sim o dado aproveitável."""
-    source = write_scanned_form_image(tmp_path / "ficha.png")
+    # O índice 0 é corrompido de propósito pelo gerador para exercitar
+    # rejeitados. O índice 5 mantém um CPF válido, portanto permite provar que
+    # OCR + extração recuperam um documento realmente aproveitável.
+    source = write_scanned_form_image(tmp_path / "ficha.png", index=5)
 
     result = ImageExtractor(_ENGINE).extract_text(source)
 
