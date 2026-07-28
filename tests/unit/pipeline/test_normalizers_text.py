@@ -89,6 +89,21 @@ def test_title_case_preserves_particles(
     assert title_case(value) == expected
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("ALMEIDA S/A", "Almeida S/A"),
+        ("nununes ltda", "Nununes LTDA"),
+        ("comercio silva me", "Comercio Silva ME"),
+        ("TRANSPORTES EIRELI", "Transportes EIRELI"),
+        ("industria e comercio ltda.", "Industria e Comercio LTDA."),
+    ],
+)
+def test_title_case_keeps_company_forms_uppercase(value: str, expected: str) -> None:
+    """Razão social errada é defeito de dado, não de estilo."""
+    assert title_case(value) == expected
+
+
 def test_case_helpers() -> None:
     assert lowercase("ANA") == "ana"
     assert uppercase("ana") == "ANA"

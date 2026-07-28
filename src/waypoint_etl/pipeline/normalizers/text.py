@@ -67,6 +67,27 @@ _NAME_PARTICLES: frozenset[str] = frozenset(
     {"da", "de", "do", "das", "dos", "e", "di", "du", "van", "von", "del", "la"}
 )
 
+# Formas jurídicas e siglas que permanecem em maiúsculas. Sem esta lista,
+# "ALMEIDA S/A" viraria "Almeida S/a": a capitalização normal destrói a
+# abreviação, e razão social errada é um defeito de dado, não de estilo.
+_COMPANY_FORMS: frozenset[str] = frozenset(
+    {
+        "s/a",
+        "s.a.",
+        "s.a",
+        "sa",
+        "ltda",
+        "ltda.",
+        "me",
+        "epp",
+        "eireli",
+        "mei",
+        "s/s",
+        "cia",
+        "cia.",
+    }
+)
+
 
 def strip(value: str | None) -> str | None:
     """Remove espaços nas pontas; vazio vira ``None``."""
@@ -125,9 +146,10 @@ def uppercase(value: str | None) -> str | None:
 
 
 def title_case(value: str | None) -> str | None:
-    """Aplica capitalização de nome próprio, preservando partículas.
+    """Aplica capitalização de nome próprio, preservando partículas e siglas.
 
-    "MARIA DA SILVA" vira "Maria da Silva", não "Maria Da Silva".
+    "MARIA DA SILVA" vira "Maria da Silva", não "Maria Da Silva", e
+    "ALMEIDA S/A" mantém a forma jurídica em maiúsculas.
     """
     if value is None:
         return None
@@ -136,9 +158,18 @@ def title_case(value: str | None) -> str | None:
         return None
 
     return " ".join(
-        word if index > 0 and word in _NAME_PARTICLES else word.capitalize()
+        _capitalize_word(word, is_first=index == 0)
         for index, word in enumerate(words)
     )
+
+
+def _capitalize_word(word: str, *, is_first: bool) -> str:
+    """Capitaliza uma palavra respeitando siglas e partículas."""
+    if word in _COMPANY_FORMS:
+        return word.upper()
+    if not is_first and word in _NAME_PARTICLES:
+        return word
+    return word.capitalize()
 
 
 def nullify_markers(value: str | None) -> str | None:
