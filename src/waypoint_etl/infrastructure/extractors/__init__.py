@@ -3,6 +3,7 @@
 from .csv_extractor import CsvExtractor
 from .docx_extractor import DocxExtractor
 from .excel_extractor import ExcelExtractor
+from .image_extractor import ImageExtractor
 from .pdf_extractor import PdfExtractor
 from .registry import (
     DOCUMENT_FORMATS,
@@ -22,6 +23,7 @@ __all__ = [
     "CsvExtractor",
     "DocxExtractor",
     "ExcelExtractor",
+    "ImageExtractor",
     "PdfExtractor",
     "TxtExtractor",
     "detect_format",

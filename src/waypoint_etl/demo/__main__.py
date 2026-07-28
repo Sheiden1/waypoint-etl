@@ -17,6 +17,8 @@ from .document_files import (
     write_customer_form_docx,
     write_customer_form_pdf,
     write_customers_txt,
+    write_scanned_form_image,
+    write_scanned_form_pdf,
 )
 from .synthetic import write_customers_csv, write_legacy_xlsx
 
@@ -30,6 +32,8 @@ def main(argv: list[str] | None = None) -> int:
         write_customers_txt(base / "clientes_legado.txt"),
         write_customer_form_docx(base / "ficha_cadastral.docx"),
         write_customer_form_pdf(base / "ficha_cadastral.pdf"),
+        write_scanned_form_pdf(base / "ficha_escaneada.pdf"),
+        write_scanned_form_image(base / "ficha_escaneada.png"),
     ]
     # Saída de script utilitário (fora do núcleo da aplicação).
     for target in targets:

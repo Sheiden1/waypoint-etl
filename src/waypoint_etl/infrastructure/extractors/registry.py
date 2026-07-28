@@ -10,11 +10,13 @@ from __future__ import annotations
 from pathlib import Path
 
 from ...application.ports.extractor import DocumentExtractor, TabularExtractor
+from ...application.ports.ocr import OcrEngine
 from ...domain.enums.source_format import SourceFormat
 from ...domain.errors import UnsupportedFormatError
 from .csv_extractor import CsvExtractor
 from .docx_extractor import DocxExtractor
 from .excel_extractor import ExcelExtractor
+from .image_extractor import ImageExtractor
 from .pdf_extractor import PdfExtractor
 from .txt_extractor import TxtExtractor
 
@@ -43,9 +45,22 @@ def _tabular_extractors() -> tuple[TabularExtractor, ...]:
     return (CsvExtractor(), ExcelExtractor())
 
 
-def _document_extractors() -> tuple[DocumentExtractor, ...]:
-    """Extratores de documento disponíveis, na ordem de tentativa."""
-    return (TxtExtractor(), DocxExtractor(), PdfExtractor())
+def _document_extractors(
+    ocr_engine: OcrEngine | None = None,
+) -> tuple[DocumentExtractor, ...]:
+    """Extratores de documento disponíveis, na ordem de tentativa.
+
+    O extrator de imagens só entra na lista quando há um motor de OCR: sem ele,
+    imagens falham com uma mensagem explícita em vez de devolver texto vazio.
+    """
+    extractors: list[DocumentExtractor] = [
+        TxtExtractor(),
+        DocxExtractor(),
+        PdfExtractor(),
+    ]
+    if ocr_engine is not None:
+        extractors.append(ImageExtractor(ocr_engine))
+    return tuple(extractors)
 
 
 def detect_format(path: Path) -> SourceFormat:
@@ -85,14 +100,16 @@ def get_tabular_extractor(path: Path) -> TabularExtractor:
     )
 
 
-def get_document_extractor(path: Path) -> DocumentExtractor:
+def get_document_extractor(
+    path: Path, *, ocr_engine: OcrEngine | None = None
+) -> DocumentExtractor:
     """Devolve o extrator de documentos capaz de ler ``path``.
 
-    Formatos previstos no MVP mas ainda não implementados falham com uma
-    mensagem explícita, nunca com um resultado simulado.
+    Formatos que dependem de um recurso ausente falham com uma mensagem
+    explícita, nunca com um resultado simulado.
     """
     source_format = detect_format(path)
-    for extractor in _document_extractors():
+    for extractor in _document_extractors(ocr_engine):
         if extractor.supports(path):
             return extractor
     if source_format in TABULAR_FORMATS:
@@ -100,7 +117,12 @@ def get_document_extractor(path: Path) -> DocumentExtractor:
             f"'{source_format.value}' é um formato tabular, não um documento. "
             "Use o extrator tabular para este arquivo."
         )
-    raise UnsupportedFormatError(
+    if source_format is SourceFormat.IMAGE:
+        raise UnsupportedFormatError(
+            "Imagens só podem ser lidas por OCR. Informe um motor de OCR em "
+            "'ocr_engine' e verifique se o Tesseract está instalado."
+        )
+    raise UnsupportedFormatError(  # pragma: no cover - guarda para novos formatos
         f"O formato '{source_format.value}' ainda não possui extrator "
         "implementado nesta versão do Waypoint."
     )

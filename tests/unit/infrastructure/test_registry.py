@@ -78,7 +78,7 @@ def test_document_extractor_rejects_tabular_with_guidance(filename: str) -> None
 
 
 @pytest.mark.parametrize("filename", ["a.png", "a.jpg", "a.jpeg"])
-def test_images_are_reported_as_pending_until_ocr(filename: str) -> None:
-    """Imagens só serão lidas no Dia 8; até lá, falham em vez de simular."""
-    with pytest.raises(UnsupportedFormatError, match="ainda não possui extrator"):
+def test_images_require_an_ocr_engine(filename: str) -> None:
+    """Imagem não tem camada de texto: sem motor de OCR, falha explicitamente."""
+    with pytest.raises(UnsupportedFormatError, match="só podem ser lidas por OCR"):
         get_document_extractor(Path(filename))
