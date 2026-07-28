@@ -33,6 +33,9 @@ tmp/
 samples/input/*.xlsx
 samples/input/*.docx
 samples/input/*.pdf
+samples/input/*.png
+samples/input/*.jpg
+samples/input/*.jpeg
 
 # IDE / SO
 .idea/

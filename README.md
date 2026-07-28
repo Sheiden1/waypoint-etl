@@ -88,6 +88,8 @@ python -m waypoint_etl.demo
 | `clientes_legado.txt`   | relatório em texto puro no estilo de exportação antiga        |
 | `ficha_cadastral.docx`  | fichas em Word, com parágrafos e tabelas rótulo/valor         |
 | `ficha_cadastral.pdf`   | fichas em PDF com camada de texto (uma por página)            |
+| `ficha_escaneada.pdf`   | PDF **sem** camada de texto, para exercitar o OCR              |
+| `ficha_escaneada.png`   | ficha como imagem digitalizada                                |
 
 Todos os registros são sintéticos e gerados com semente fixa: nenhum dado
 pessoal real é usado ou versionado.
@@ -121,6 +123,33 @@ fields:
 As transformações vêm de um catálogo fechado: um template escolhe entre funções
 conhecidas e auditáveis, nunca executa código arbitrário. Um nome inexistente
 faz o carregamento falhar listando as opções válidas.
+
+## Requisitos externos
+
+Duas funcionalidades dependem de programas que **não** vêm com as dependências
+Python. A ausência de qualquer um deles não impede o projeto de rodar — apenas
+limita o que está disponível, sempre com mensagem explícita:
+
+| Recurso        | Sem ele                                                       |
+| -------------- | ------------------------------------------------------------- |
+| **PostgreSQL** | só o modo `dry-run`; exportações continuam funcionando         |
+| **Tesseract**  | PDFs escaneados e imagens não são lidos (os demais formatos sim) |
+
+Para o OCR, instale o Tesseract e, se ele não estiver no `PATH`, aponte
+`TESSERACT_CMD` no `.env`. O pacote de idioma português (`por`) é recomendado;
+sem ele o Waypoint cai para o inglês em vez de falhar.
+
+Os testes que dependem desses serviços são pulados automaticamente quando eles
+não estão presentes:
+
+```bash
+# OCR real (exige o Tesseract instalado)
+uv run pytest tests/integration/test_ocr_tesseract.py -v
+
+# PostgreSQL real (exige um banco de teste descartável)
+export WAYPOINT_TEST_DATABASE_URL=postgresql+psycopg://waypoint:waypoint@localhost:5432/waypoint_test
+uv run pytest tests/integration/test_postgres_load.py -v
+```
 
 ## Licença
 

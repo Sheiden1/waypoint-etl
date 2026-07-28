@@ -942,21 +942,49 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 > externo, e-mail) e aproximada (nome semelhante + telefone ou CEP), que apenas
 > alerta: o MVP nunca mescla registros.
 
-### Dia 7 — Banco
+### Dia 7 — Banco ✅ (concluído)
 
-- PostgreSQL;
-- SQLAlchemy;
-- Alembic;
-- transações;
-- teste de integração.
+- [x] PostgreSQL;
+- [x] SQLAlchemy;
+- [x] Alembic;
+- [x] transações;
+- [x] teste de integração.
 
-### Dia 8 — OCR
+> Modelos das cinco tabelas (`customers`, `contacts`, `invoices`,
+> `migration_runs`, `migration_issues`) com tipos **portáveis**, o que permite
+> exercitar o comportamento transacional real contra SQLite sem subir um banco.
+> `MigrationRun` carrega todos os campos da seção 15, com `run_id` UUID e hash
+> SHA-256 do arquivo de origem. `load_records` barra o `dry-run` **antes** de
+> qualquer conexão (regra 15) e a carga é atômica: erro de infraestrutura
+> reverte o lote inteiro. Issues são gravadas já mascaradas. Migração Alembic
+> inicial validada aplicando-a de verdade.
+>
+> ⚠️ O teste contra PostgreSQL real existe em
+> `tests/integration/test_postgres_load.py`, mas **não foi executado**: exige
+> `WAYPOINT_TEST_DATABASE_URL`. Pendente para a seção 26.
 
-- Tesseract;
-- pré-processamento com OpenCV;
-- fallback automático;
-- fixture escaneada;
-- testes.
+### Dia 8 — OCR ✅ (concluído, com ressalva)
+
+- [x] Tesseract;
+- [x] pré-processamento com OpenCV;
+- [x] fallback automático;
+- [x] fixture escaneada;
+- [x] testes.
+
+> O fallback é um **decorador** (`DocumentExtractorWithOcr`), não uma alteração
+> do `PdfExtractor`: o extrator segue puro e testável sem Tesseract, e o custo
+> de rasterizar páginas fica explícito em quem monta o pipeline. A heurística da
+> seção 12 vive em `pipeline/cleaners/text_quality.py` e combina contagem de
+> caracteres, proporção alfanumérica e presença de padrões esperados — um CPF
+> legível basta para dispensar o OCR. Só as páginas insuficientes são
+> processadas, e o uso do OCR sempre vira aviso no relatório. `ImageExtractor`
+> fecha o último formato do MVP. Fixtures escaneados (PDF sem camada de texto e
+> PNG) gerados por `make demo-data`.
+>
+> ⚠️ Toda a lógica de decisão é testada com um motor falso e determinístico,
+> mas o **OCR real não foi executado**: o Tesseract não está instalado neste
+> ambiente. `tests/integration/test_ocr_tesseract.py` cobre esse caminho e é
+> pulado automaticamente. A seção 26 exige rodá-lo antes da release.
 
 ### Dia 9 — CLI
 
