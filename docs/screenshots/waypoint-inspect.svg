@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Inspeção de arquivo CSV no Waypoint</title>
+  <desc id="desc">Terminal lista formato, dez colunas encontradas e uma prévia de dados sintéticos.</desc>
+  <rect width="1200" height="675" rx="24" fill="#0d1117"/>
+  <rect x="24" y="24" width="1152" height="627" rx="16" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <circle cx="58" cy="58" r="8" fill="#ff7b72"/>
+  <circle cx="84" cy="58" r="8" fill="#d29922"/>
+  <circle cx="110" cy="58" r="8" fill="#3fb950"/>
+  <text x="600" y="64" text-anchor="middle" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="18">Waypoint · inspect</text>
+  <g font-family="Consolas, monospace" font-size="21">
+    <text x="62" y="118" fill="#58a6ff">$ waypoint-etl inspect samples/input/clientes_legado.csv</text>
+    <text x="62" y="168" fill="#c9d1d9">Arquivo:  clientes_legado.csv</text>
+    <text x="62" y="204" fill="#c9d1d9">Formato:  csv</text>
+    <text x="62" y="240" fill="#c9d1d9">Colunas:  10</text>
+    <text x="90" y="286" fill="#8b949e">Código              Nome Cliente</text>
+    <text x="90" y="322" fill="#8b949e">CPF_CNPJ            Correio Eletrônico</text>
+    <text x="90" y="358" fill="#8b949e">Fone Principal      CEP</text>
+    <text x="90" y="394" fill="#8b949e">Cidade              UF</text>
+    <text x="90" y="430" fill="#8b949e">Data Cadastro       Observação Interna Antiga</text>
+    <text x="62" y="494" fill="#c9d1d9">Prévia:</text>
+    <text x="90" y="536" fill="#3fb950">ERP-1000 · ALMEIDA S/A · 98.949.230/0001-04</text>
+    <text x="90" y="572" fill="#3fb950">ERP-1001 · Nununes LTDA · 59211226000184</text>
+    <text x="90" y="608" fill="#d29922">ERP-1002 · Fábio Carvalho · e-mail inválido</text>
+  </g>
+</svg>

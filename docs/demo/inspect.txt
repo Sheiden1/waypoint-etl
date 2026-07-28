@@ -1,0 +1,9 @@
+$ waypoint-etl inspect clientes_legado.csv
+
+Arquivo:  clientes_legado.csv
+Formato:  csv
+Colunas:  10
+
+Prévia:
+ERP-1000 · ALMEIDA S/A
+ERP-1001 · Nununes LTDA

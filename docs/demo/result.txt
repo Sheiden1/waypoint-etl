@@ -1,0 +1,8 @@
+$ waypoint-etl migrate --dry-run
+
+Total:       55
+Válidos:     45
+Rejeitados:  10
+Duplicatas:  4
+
+4 artefatos · 1 run_id · nenhuma escrita no banco

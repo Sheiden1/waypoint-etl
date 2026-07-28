@@ -1008,31 +1008,70 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 > apontar a divergência de formato. Daí também nasceu
 > `mappings/erp_legacy_customers_csv.yaml`.
 
-### Dia 10 — Streamlit
+### Dia 10 — Streamlit ✅ (concluído)
 
-- upload;
-- mapeamento;
-- prévia;
-- resultados;
-- downloads.
+- [x] upload;
+- [x] mapeamento;
+- [x] prévia;
+- [x] resultados;
+- [x] downloads.
 
-### Dia 11 — Open source
+> Assistente real de cinco etapas em
+> `presentation/streamlit/app.py`, consumindo os mesmos casos de uso da CLI.
+> Uploads são limitados por `MAX_UPLOAD_MB`, têm o nome saneado, vivem somente
+> em diretório temporário e são removidos ao fim de cada operação. A origem
+> aceita todos os formatos do MVP para inspeção; CSV e Excel seguem para o
+> pipeline estruturado.
+>
+> O De/Para pode ser escolhido no catálogo, enviado como YAML ou criado
+> visualmente pela associação de cada coluna a um campo canônico. A validação
+> sempre começa em `dry-run`; os quatro artefatos têm downloads reais, e a
+> carga PostgreSQL só aparece quando `DATABASE_URL` está configurada e exige
+> confirmação explícita. Prévia de válidos, issues e duplicidades mascara
+> CPF/CNPJ. `make dev` inicia a interface. Teste smoke do app e testes do
+> adaptador cobrem os fluxos; 503 testes verdes, Ruff e mypy (strict) limpos.
 
-- Docker;
-- GitHub Actions;
-- documentação;
-- contribuição;
-- licença MIT;
-- segurança.
+### Dia 11 — Open source ✅ (concluído)
 
-### Dia 12 — Publicação
+- [x] Docker;
+- [x] GitHub Actions;
+- [x] documentação;
+- [x] contribuição;
+- [x] licença MIT;
+- [x] segurança.
 
-- revisão completa;
-- release `v0.1.0`;
-- screenshots;
-- GIF ou vídeo;
-- README em português com resumo em inglês;
-- publicação no LinkedIn.
+> Imagem Python 3.12 com Tesseract e idioma português, usuário sem privilégios,
+> healthcheck e interface Streamlit. O Compose sobe PostgreSQL com volume,
+> espera o banco ficar saudável, aplica Alembic e só então inicia o app. O CI
+> executa Ruff, mypy strict, cobertura mínima de 80%, testes com Tesseract e
+> PostgreSQL reais, build da distribuição e um segundo job que constrói e testa
+> o Compose.
+>
+> Adicionados guia de contribuição, código de conduta, política de segurança,
+> changelog, templates de issue/PR, pre-commit, arquitetura e guia De/Para. A
+> licença MIT existente foi preservada. A validação local alcançou 95% de
+> cobertura; Docker será comprovado pelo runner Linux porque não está instalado
+> nesta máquina.
+
+### Dia 12 — Publicação (em conclusão)
+
+- [x] revisão completa;
+- [ ] release `v0.1.0`;
+- [x] screenshots;
+- [x] GIF ou vídeo;
+- [x] README em português com resumo em inglês;
+- [ ] publicação no LinkedIn.
+
+> A revisão de release encontrou e corrigiu a ligação ausente do Tesseract nas
+> interfaces: CLI e Streamlit agora instanciam o motor real ao inspecionar
+> imagens e PDFs. A fixture CSV versionada possui snapshot esperado com 55
+> registros, 45 válidos, 10 rejeitados e 4 duplicatas. Foram criadas duas
+> capturas vetoriais, um vídeo MP4 curto, notas da release e o texto pronto para
+> LinkedIn em `docs/linkedin-v0.1.0.md`.
+>
+> A tag depende do CI verde no GitHub. A publicação no LinkedIn permanece como
+> ação externa: não há conector disponível nesta sessão, mas o conteúdo está
+> pronto para copiar e publicar.
 
 ---
 

@@ -1,0 +1,17 @@
+{
+  "source": {
+    "filename": "clientes_legado.csv",
+    "sha256": "1a3994278d9c4b26ffc85d4d180cdf5537e1fd207d7e384ab6f4d5b03c68898e"
+  },
+  "mapping": {
+    "name": "ERP Legado - Clientes (CSV)",
+    "version": 1
+  },
+  "totals": {
+    "total_records": 55,
+    "valid_records": 45,
+    "rejected_records": 10,
+    "duplicate_records": 4,
+    "possible_duplicates": 0
+  }
+}
