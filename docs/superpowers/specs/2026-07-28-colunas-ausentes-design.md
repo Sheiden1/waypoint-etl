@@ -42,7 +42,10 @@ Uma coluna ausente **bloqueia a execução** se, e somente se:
    (`full_name` e `document` para clientes), **ou**
 2. o template declara `required: true` para aquele campo.
 
-Qualquer outra ausência é tolerada: o campo fica nulo e um aviso é registrado.
+Qualquer outra ausência é tolerada e gera aviso. O valor do campo canônico segue
+o comportamento que `map_record` já tem para valor nulo: fica nulo, ou recebe o
+`default` do template quando ele estiver declarado. O aviso é emitido nos dois
+casos, porque o fato relevante é a coluna não existir no arquivo.
 
 A segunda condição torna o flag do YAML honesto. Quem escreve um template ganha
 um controle real — pode exigir `email` para o seu caso de negócio, mesmo que o
@@ -94,6 +97,8 @@ backend permanece a fonte da verdade.
 Unitários em `tests/unit/pipeline/`:
 
 - coluna opcional ausente: executa, campo canônico nulo, aviso presente;
+- coluna opcional ausente com `default` declarado: executa, campo recebe o
+  padrão, aviso presente;
 - coluna canônica obrigatória ausente: `MappingError` antes de mapear qualquer
   linha;
 - coluna marcada `required: true` no YAML, opcional no schema canônico, ausente:
