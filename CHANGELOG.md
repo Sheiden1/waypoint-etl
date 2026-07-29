@@ -5,6 +5,21 @@ Todas as mudanças relevantes deste projeto serão documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o
 versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [Não publicado]
+
+### Adicionado
+
+- instância pública gratuita da jornada web: interface no Vercel Hobby e API no
+  Render Free, validadas pelo smoke test remoto;
+- `MAPPINGS_DIR` para localizar o catálogo De/Para independentemente do layout
+  de instalação do pacote.
+
+### Corrigido
+
+- catálogo de templates De/Para vinha vazio sempre que o pacote era instalado
+  (imagem Docker da API e do Streamlit): o caminho padrão era derivado da árvore
+  de fontes, que não existe em `site-packages`.
+
 ## [0.1.0] - 2026-07-28
 
 ### Adicionado

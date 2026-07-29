@@ -124,12 +124,24 @@ npm --prefix web run test:run
 npm --prefix web run build
 ```
 
-As Fases 1–5 estão funcionais. A Fase 6 possui configuração reproduzível para
-Vercel Hobby, Render Free e Neon Free opcional, mas nenhum deploy externo deste
-repositório foi executado. Consulte o
-[guia de deploy gratuito](docs/deployment.md) para publicar e rodar o smoke test,
-e o [roadmap da plataforma web](docs/web-platform-roadmap.md) para o estado de
-cada fase.
+A jornada web está publicada em serviços gratuitos, com o smoke test remoto
+aprovado nas sete checagens:
+
+| Serviço | URL | Plano |
+| --- | --- | --- |
+| Interface | <https://waypoint-etl.vercel.app> | Vercel Hobby |
+| API | <https://waypoint-etl-api.onrender.com> | Render Free |
+
+A instância pública é uma demonstração: **não envie dados pessoais reais**. Ela
+roda sem banco configurado, então a carga no PostgreSQL aparece como
+indisponível enquanto inspeção, validação e downloads seguem funcionando. A API
+gratuita entra em repouso após 15 minutos sem tráfego, e a primeira chamada
+depois disso pode levar cerca de um minuto.
+
+Consulte o [guia de deploy gratuito](docs/deployment.md) para publicar sua
+própria instância e rodar o smoke test, e o
+[roadmap da plataforma web](docs/web-platform-roadmap.md) para o estado de cada
+fase.
 
 ## Início rápido com Docker
 

@@ -2,9 +2,14 @@
 
 > Arquitetura e roadmap da jornada iniciada após a `v0.1.0`.
 
-**Estado atual:** as Fases 1–5 estão funcionais no ambiente local. A Fase 6 está
-preparada e documentada, mas a publicação no Vercel/Render e o smoke test remoto
-ainda dependem da criação dos serviços externos.
+**Estado atual:** as Fases 1–5 estão funcionais e a Fase 6 está concluída. A
+interface está publicada no Vercel Hobby e a API no Render Free, com o smoke
+test remoto aprovado nas sete checagens.
+
+| Serviço | URL pública |
+| --- | --- |
+| Interface | <https://waypoint-etl.vercel.app> |
+| API | <https://waypoint-etl-api.onrender.com> |
 
 ## Visão
 
@@ -222,7 +227,7 @@ o TTL.
 
 **Aceite:** trocar o tema não altera regras, resultados ou acessibilidade.
 
-### Fase 6 — Deploy gratuito e transição (preparada)
+### Fase 6 — Deploy gratuito e transição ✅
 
 - [x] configuração do frontend para Vercel Hobby;
 - [x] imagem Docker e Blueprint da API para Render Free;
@@ -230,16 +235,25 @@ o TTL.
 - [x] CORS e variáveis de ambiente documentados;
 - [x] script reproduzível de smoke test;
 - [x] Streamlit mantido como interface clássica;
-- [ ] frontend publicado no Vercel Hobby;
-- [ ] API publicada no Render Free;
-- [ ] smoke test executado contra as URLs públicas.
+- [x] frontend publicado no Vercel Hobby;
+- [x] API publicada no Render Free;
+- [x] smoke test executado contra as URLs públicas.
 
-**Aceite local concluído:** os arquivos de infraestrutura e o procedimento estão
-no [guia de deploy gratuito](deployment.md), sem depender de serviço pago.
+**Aceite concluído:** os dois serviços estão no ar nos planos gratuitos, o CORS
+autoriza somente a origem canônica de produção e `scripts/smoke_deployment.py`
+aprovou as sete checagens contra as URLs públicas. O cenário sintético manteve
+os totais de regressão (55 processados, 45 válidos, 10 rejeitados, 4
+duplicidades) executando na infraestrutura pública.
 
-**Aceite externo pendente:** publicar os dois serviços, fechar o CORS com a URL
-real do Vercel e executar `scripts/smoke_deployment.py` contra as URLs públicas.
-Esse passo exige contas e recursos externos e ainda não foi executado.
+Duas observações operacionais registradas durante a publicação:
+
+- o repositório foi importado no Render por URL pública, sem a GitHub App. Como
+  o Render não consegue ler o status dos checks nessa configuração, o
+  `autoDeployTrigger: checksPass` do `render.yaml` não dispara: cada push exige
+  um deploy manual até que a integração seja instalada;
+- no Vercel, apenas o alias canônico de produção é público. As URLs por
+  deployment e por branch respondem `302` para o SSO da Vercel por causa do
+  Deployment Protection, e não servem para divulgação nem para o smoke test.
 
 ## Qualidade
 
@@ -264,4 +278,4 @@ Cada fase precisa manter:
 - [x] o projeto continua executável por CLI, interface clássica e Docker;
 - [x] o deploy gratuito está configurado e documentado sem promessa de
   disponibilidade produtiva;
-- [ ] a instalação pública foi validada pelo smoke test remoto.
+- [x] a instalação pública foi validada pelo smoke test remoto.
