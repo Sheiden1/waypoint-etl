@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from ...application.dto.extraction import ExtractionOptions
 from ...domain.enums.entity_type import EntityType
 from ...domain.enums.source_format import SourceFormat
+from ...domain.services.canonical_schema import required_field_names
 
 SUPPORTED_TEMPLATE_VERSION = 1
 
@@ -70,11 +71,30 @@ class MappingTemplate:
                 return mapping
         return None
 
-    def missing_columns(self, available: tuple[str, ...]) -> tuple[str, ...]:
-        """Colunas declaradas no template que não existem no arquivo lido."""
+    def _is_blocking(self, mapping: FieldMapping) -> bool:
+        """Indica se a ausência da coluna impede a migração.
+
+        Bloqueia quando o destino é obrigatório no schema canônico — sem ele o
+        registro perde identidade — ou quando o próprio template exige o campo.
+        """
+        return mapping.required or mapping.target in required_field_names(self.entity)
+
+    def missing_blocking_columns(self, available: tuple[str, ...]) -> tuple[str, ...]:
+        """Colunas ausentes cuja falta impede processar o arquivo."""
         present = set(available)
         return tuple(
-            mapping.source for mapping in self.fields if mapping.source not in present
+            mapping.source
+            for mapping in self.fields
+            if mapping.source not in present and self._is_blocking(mapping)
+        )
+
+    def missing_tolerable_columns(self, available: tuple[str, ...]) -> tuple[str, ...]:
+        """Colunas ausentes que apenas deixam o campo canônico sem origem."""
+        present = set(available)
+        return tuple(
+            mapping.source
+            for mapping in self.fields
+            if mapping.source not in present and not self._is_blocking(mapping)
         )
 
 

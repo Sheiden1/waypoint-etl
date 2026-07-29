@@ -89,8 +89,14 @@ estados, calculados a partir do template e das colunas do arquivo:
 | alguma obrigatória ausente | `Incompatível` (erro) | "Este template não serve para este arquivo. Faltam colunas obrigatórias: …" |
 
 O terceiro caso cobre a escolha de template errado, que hoje aparece como
-"arquivo incompleto" e desorienta. O botão de avançar continua sem bloqueio: o
-backend permanece a fonte da verdade.
+"arquivo incompleto" e desorienta.
+
+O botão de avançar é liberado quando faltam apenas colunas toleráveis. Hoje
+`canContinue` exige ausência zero, o que impede o usuário de prosseguir mesmo
+quando falta só um campo opcional. Passa a considerar somente as bloqueantes. A
+interface usa `ENTITY_DEFINITIONS`, que já espelha os campos obrigatórios do
+schema canônico, então nenhum endpoint novo é necessário. O backend permanece a
+fonte da verdade: a interface apenas antecipa o resultado.
 
 ## Testes
 

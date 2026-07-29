@@ -135,14 +135,88 @@ def test_apply_mapping_over_a_batch() -> None:
     assert result.records[1].values["document"] == "11222333000181"
 
 
-def test_missing_column_fails_before_processing_any_row() -> None:
+def test_missing_required_column_fails_before_processing_any_row() -> None:
     """Template incompatível é erro de configuração, não lote rejeitado."""
+    extraction = _extraction({"Nome Cliente": "ana"}, columns=("Nome Cliente", "Fone"))
+
+    with pytest.raises(MappingError, match="CPF_CNPJ"):
+        apply_mapping(extraction, TEMPLATE)
+
+
+def test_missing_optional_column_runs_with_a_warning() -> None:
+    """Export legado sem uma coluna opcional não deve travar a migração."""
     extraction = _extraction(
-        {"Nome Cliente": "ana"}, columns=("Nome Cliente", "CPF_CNPJ")
+        {"Nome Cliente": "ana", "CPF_CNPJ": "1"},
+        columns=("Nome Cliente", "CPF_CNPJ"),
     )
 
-    with pytest.raises(MappingError, match="Fone"):
-        apply_mapping(extraction, TEMPLATE)
+    result = apply_mapping(extraction, TEMPLATE)
+
+    assert result.records[0].values["phone"] is None
+    assert any("opcional(is) ausente(s)" in warning for warning in result.warnings)
+    assert any("Fone" in warning for warning in result.warnings)
+
+
+def test_missing_optional_column_with_default_uses_the_default() -> None:
+    """O padrão declarado vale também quando a coluna inteira falta."""
+    template = parse_mapping(
+        dedent(
+            """
+            version: 1
+            name: Teste
+            entity: customers
+            fields:
+              Nome Cliente:
+                target: full_name
+                required: true
+              CPF_CNPJ:
+                target: document
+                required: true
+              UF:
+                target: state
+                default: SP
+            """
+        )
+    )
+    extraction = _extraction(
+        {"Nome Cliente": "ana", "CPF_CNPJ": "1"},
+        columns=("Nome Cliente", "CPF_CNPJ"),
+    )
+
+    result = apply_mapping(extraction, template)
+
+    assert result.records[0].values["state"] == "SP"
+    assert any("opcional(is) ausente(s)" in warning for warning in result.warnings)
+
+
+def test_template_can_require_a_canonically_optional_column() -> None:
+    """O flag required do YAML bloqueia mesmo fora do schema canônico."""
+    template = parse_mapping(
+        dedent(
+            """
+            version: 1
+            name: Teste
+            entity: customers
+            fields:
+              Nome Cliente:
+                target: full_name
+                required: true
+              CPF_CNPJ:
+                target: document
+                required: true
+              Correio:
+                target: email
+                required: true
+            """
+        )
+    )
+    extraction = _extraction(
+        {"Nome Cliente": "ana", "CPF_CNPJ": "1"},
+        columns=("Nome Cliente", "CPF_CNPJ"),
+    )
+
+    with pytest.raises(MappingError, match="Correio"):
+        apply_mapping(extraction, template)
 
 
 def test_unmapped_column_produces_a_warning() -> None:

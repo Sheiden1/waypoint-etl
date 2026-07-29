@@ -154,6 +154,72 @@ describe("MappingWorkspace", () => {
     );
     expect(onContinue.mock.calls[0]?.[0].filename).toBe("meu-template.yaml");
   });
+
+  it("tolera coluna opcional ausente e libera a continuação", async () => {
+    const onContinue = vi.fn<(draft: MappingDraft) => void>();
+    getMappingsMock.mockResolvedValue({
+      templates: [
+        {
+          ...catalogTemplate,
+          fields: [
+            ...catalogTemplate.fields,
+            {
+              source: "Correio Eletrônico",
+              target: "email",
+              required: false,
+              transforms: ["email"],
+            },
+          ],
+        },
+      ],
+    });
+    renderWorkspace(preview, vi.fn(), onContinue);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Template pronto" }));
+
+    expect(await screen.findByText("Campos vazios")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Ficarão vazias: Correio Eletrônico/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Continuar para validação" }),
+    ).toBeEnabled();
+  });
+
+  it("bloqueia quando falta coluna obrigatória do template", async () => {
+    getMappingsMock.mockResolvedValue({
+      templates: [
+        {
+          ...catalogTemplate,
+          fields: [
+            {
+              source: "RAZAO_SOCIAL",
+              target: "full_name",
+              required: true,
+              transforms: [],
+            },
+            {
+              source: "CNPJ",
+              target: "document",
+              required: true,
+              transforms: [],
+            },
+          ],
+        },
+      ],
+    });
+    renderWorkspace(preview);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Template pronto" }));
+
+    expect(await screen.findByText("Incompatível")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Faltam colunas obrigatórias: RAZAO_SOCIAL, CNPJ/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Continuar para validação" }),
+    ).toHaveAttribute("aria-disabled", "true");
+  });
 });
 
 const preview: SourcePreview = {

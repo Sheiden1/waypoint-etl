@@ -192,14 +192,27 @@ export function MappingWorkspace({
       : mode === "upload"
         ? uploadedTemplate
         : null;
-  const externalMissingColumns =
-    externalTemplate?.fields
-      .map((field) => field.source)
-      .filter((source) => !preview.columns.includes(source)) ?? [];
+  // Espelha a regra do backend: falta coluna obrigatória impede a migração,
+  // falta coluna opcional apenas deixa o campo canônico sem origem.
+  const canonicalRequired = new Set(
+    definition.fields.filter((field) => field.required).map((field) => field.name),
+  );
+  const externalAbsentFields =
+    externalTemplate?.fields.filter(
+      (field) => !preview.columns.includes(field.source),
+    ) ?? [];
+  const externalBlockingColumns = externalAbsentFields
+    .filter((field) => field.required || canonicalRequired.has(field.target))
+    .map((field) => field.source);
+  const externalTolerableColumns = externalAbsentFields
+    .filter(
+      (field) => !(field.required || canonicalRequired.has(field.target)),
+    )
+    .map((field) => field.source);
   const canContinue =
     mode === "visual"
       ? missingRequired.length === 0
-      : externalTemplate !== null && externalMissingColumns.length === 0;
+      : externalTemplate !== null && externalBlockingColumns.length === 0;
 
   const entityOptions = useMemo(
     () =>
@@ -518,7 +531,8 @@ export function MappingWorkspace({
             {selectedTemplate ? (
               <TemplateSummary
                 template={selectedTemplate}
-                missingColumns={externalMissingColumns}
+                blockingColumns={externalBlockingColumns}
+                tolerableColumns={externalTolerableColumns}
               />
             ) : (
               <Banner
@@ -566,7 +580,8 @@ export function MappingWorkspace({
             {uploadedTemplate ? (
               <TemplateSummary
                 template={uploadedTemplate}
-                missingColumns={externalMissingColumns}
+                blockingColumns={externalBlockingColumns}
+                tolerableColumns={externalTolerableColumns}
               />
             ) : null}
           </div>
@@ -703,11 +718,19 @@ function yamlString(value: string): string {
 
 function TemplateSummary({
   template,
-  missingColumns,
+  blockingColumns,
+  tolerableColumns,
 }: {
   template: MappingTemplate;
-  missingColumns: string[];
+  blockingColumns: string[];
+  tolerableColumns: string[];
 }) {
+  const status =
+    blockingColumns.length > 0
+      ? "blocking"
+      : tolerableColumns.length > 0
+        ? "tolerable"
+        : "compatible";
   return (
     <div className="mapping-template-summary">
       <div className="mapping-template-heading">
@@ -720,8 +743,20 @@ function TemplateSummary({
           </Text>
         </div>
         <Badge
-          variant={missingColumns.length === 0 ? "success" : "warning"}
-          label={missingColumns.length === 0 ? "Compatível" : "Revisar colunas"}
+          variant={
+            status === "compatible"
+              ? "success"
+              : status === "tolerable"
+                ? "warning"
+                : "error"
+          }
+          label={
+            status === "compatible"
+              ? "Compatível"
+              : status === "tolerable"
+                ? "Campos vazios"
+                : "Incompatível"
+          }
         />
       </div>
       <div className="mapping-template-fields">
@@ -737,11 +772,24 @@ function TemplateSummary({
           </div>
         ))}
       </div>
-      {missingColumns.length > 0 ? (
+      {blockingColumns.length > 0 ? (
+        <Banner
+          status="error"
+          title="Este template não serve para este arquivo"
+          description={
+            `Faltam colunas obrigatórias: ${blockingColumns.join(", ")}. ` +
+            "Escolha outro template, envie um YAML compatível ou monte o " +
+            "De/Para visualmente."
+          }
+        />
+      ) : tolerableColumns.length > 0 ? (
         <Banner
           status="warning"
-          title="O arquivo não possui todas as colunas do template"
-          description={`Ausentes: ${missingColumns.join(", ")}.`}
+          title="Algumas colunas opcionais não existem no arquivo"
+          description={
+            `Ficarão vazias: ${tolerableColumns.join(", ")}. ` +
+            "A validação pode continuar normalmente."
+          }
         />
       ) : null}
     </div>

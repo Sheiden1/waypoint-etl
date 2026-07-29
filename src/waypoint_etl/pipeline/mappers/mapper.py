@@ -50,16 +50,19 @@ def apply_mapping(
 ) -> MappingResult:
     """Aplica o template a um resultado de extração.
 
-    Falha antes de processar qualquer linha quando o arquivo não tem as colunas
-    declaradas — problema de configuração não deve virar lote inteiro rejeitado.
+    Falha antes de processar qualquer linha quando falta uma coluna obrigatória
+    — problema de configuração não deve virar lote inteiro rejeitado. A ausência
+    de coluna opcional é fato comum de export legado: o campo canônico fica sem
+    origem e a execução segue com aviso.
     """
-    missing = template.missing_columns(extraction.columns)
-    if missing:
-        listed = ", ".join(missing)
+    blocking = template.missing_blocking_columns(extraction.columns)
+    if blocking:
+        listed = ", ".join(blocking)
         available = ", ".join(extraction.columns)
         raise MappingError(
-            f"O template '{template.name}' espera a(s) coluna(s) {listed}, que "
-            f"não existe(m) em '{extraction.source_name}'. "
+            f"O template '{template.name}' espera a(s) coluna(s) obrigatória(s) "
+            f"{listed}, que não existe(m) em '{extraction.source_name}'. "
+            f"Confira se o template corresponde a este arquivo. "
             f"Colunas encontradas: {available}."
         )
 
@@ -108,15 +111,26 @@ def _unmapped_columns(
 def _build_warnings(
     columns: tuple[str, ...], template: MappingTemplate
 ) -> tuple[str, ...]:
-    """Avisa sobre colunas que serão descartadas sem declaração explícita."""
+    """Avisa sobre colunas descartadas e sobre campos opcionais sem origem."""
+    warnings: list[str] = []
+
     unmapped = _unmapped_columns(columns, template)
-    if not unmapped:
-        return ()
-    listed = ", ".join(unmapped)
-    return (
-        f"Coluna(s) não mapeada(s) e descartada(s): {listed}. "
-        "Declare em 'ignored_fields' para tornar o descarte explícito.",
-    )
+    if unmapped:
+        listed = ", ".join(unmapped)
+        warnings.append(
+            f"Coluna(s) não mapeada(s) e descartada(s): {listed}. "
+            "Declare em 'ignored_fields' para tornar o descarte explícito."
+        )
+
+    absent = template.missing_tolerable_columns(columns)
+    if absent:
+        listed = ", ".join(absent)
+        warnings.append(
+            f"Coluna(s) opcional(is) ausente(s) no arquivo: {listed}. "
+            "O campo canônico correspondente ficou sem origem."
+        )
+
+    return tuple(warnings)
 
 
 __all__ = [
