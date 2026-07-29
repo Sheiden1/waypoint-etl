@@ -1103,7 +1103,11 @@ Princípios adicionais desta jornada:
 - nenhuma rota HTTP pode duplicar regra do pipeline;
 - funcionalidades planejadas não aparecem como controles ativos.
 
-### `v0.2.0`
+### `v0.2.0` — publicada em 29 de julho de 2026
+
+Release em `https://github.com/Sheiden1/waypoint-etl/releases/tag/v0.2.0`, com
+wheel e source distribution. Lançada com quatro itens desta lista pendentes, por
+decisão explícita: a jornada web estava completa e valia publicar.
 
 - [x] templates criados pela interface;
 - [x] API REST opcional;
@@ -1127,6 +1131,39 @@ canônicos" da seção 19, que era previsto e não estava implementado.
 - métricas Prometheus.
 
 Não implemente o roadmap antes do MVP estar concluído.
+
+---
+
+### Onde o trabalho parou
+
+Escrito para quem retomar o projeto em outra máquina ou em outra sessão.
+
+**Estado:** `v0.2.0` publicada, CI verde, instância pública no ar e validada
+pelo smoke test. Nada em andamento pela metade.
+
+**Candidatos a próximo passo**, em ordem de valor aparente:
+
+1. os quatro itens pendentes da `v0.2.0` acima. O **histórico visual de
+   execuções** é o mais estruturante: exige persistir `migration_runs` de forma
+   consultável e uma tela nova, e as tabelas de auditoria já existem;
+2. **linha de cabeçalho na interface web.** Hoje `web/src/lib/api.ts` fixa
+   `header_row=1`, então exports com linhas de título antes do cabeçalho — comuns
+   em ERP — só funcionam por YAML, CLI ou Streamlit;
+3. **estruturação de documentos além de rótulo/valor.** Tabelas dentro de PDF e
+   texto corrido sem rótulos ainda não viram registros;
+4. **publicação no LinkedIn**, pendente desde a `v0.1.0`. Existe texto pronto
+   para a `v0.1.0` em `docs/linkedin-v0.1.0.md`; não há equivalente para a
+   `v0.2.0`.
+
+**Armadilhas já pagas, para não repetir:**
+
+- o wheel **não** contém `mappings/`. O catálogo vem do repositório ou da imagem
+  Docker, por `MAPPINGS_DIR`. Derivar o caminho da árvore de fontes quebra em
+  qualquer ambiente com o pacote instalado;
+- o `autoDeployTrigger: checksPass` do Render depende da GitHub App instalada no
+  repositório. Ela está instalada e o auto-deploy funciona;
+- no Vercel, só o alias canônico de produção é público; URLs por deployment e
+  por branch caem no SSO do Deployment Protection.
 
 ---
 
