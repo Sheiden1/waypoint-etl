@@ -1,0 +1,73 @@
+# Template De/Para: fichas cadastrais em DOCX do ERP legado fictício.
+#
+# O extrator de DOCX percorre parágrafos e tabelas na ordem original e
+# representa cada linha de tabela como `Rótulo | valor`. Por isso este template
+# usa `|` como separador de rótulo, e não `:` como o relatório em TXT: a mesma
+# informação muda de forma conforme o formato de origem.
+version: 1
+name: ERP Legado - Clientes (DOCX)
+entity: customers
+
+source:
+  type: docx
+  record_mode: separator
+  record_separator: '^Cliente ERP-\d+$'
+  label_separator: '|'
+
+fields:
+  Código:
+    target: external_id
+    required: false
+    transforms:
+      - clean_text
+
+  Nome:
+    target: full_name
+    required: true
+    transforms:
+      - clean_text
+      - title_case
+
+  CPF/CNPJ:
+    target: document
+    required: true
+    transforms:
+      - digits_only
+
+  E-mail:
+    target: email
+    required: false
+    transforms:
+      - email
+
+  Telefone:
+    target: phone
+    required: false
+    transforms:
+      - brazilian_phone
+
+  CEP:
+    target: postal_code
+    required: false
+    transforms:
+      - postal_code
+
+  Cidade:
+    target: city
+    required: false
+    transforms:
+      - clean_text
+      - title_case
+
+  UF:
+    target: state
+    required: false
+    transforms:
+      - uf
+
+  Data de Cadastro:
+    target: created_at
+    required: false
+    transforms:
+      - clean_text
+      - brazilian_date

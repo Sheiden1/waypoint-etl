@@ -212,7 +212,35 @@ def test_wrong_entity_is_rejected(workbook: Path, tmp_path: Path) -> None:
     assert "invoices" in result.stderr
 
 
-def test_documents_are_rejected_with_guidance(tmp_path: Path) -> None:
+def test_document_migrates_with_a_document_template(tmp_path: Path) -> None:
+    """TXT percorre o mesmo pipeline de uma planilha e gera os artefatos."""
+    from waypoint_etl.demo.document_files import write_customers_txt
+
+    source = write_customers_txt(tmp_path / "clientes.txt", count=2)
+    output = tmp_path / "exports"
+
+    result = runner.invoke(
+        app,
+        [
+            "migrate",
+            "--input",
+            str(source),
+            "--mapping",
+            "mappings/erp_legacy_customers_txt.yaml",
+            "--output",
+            str(output),
+        ],
+    )
+
+    assert result.exit_code in {0, 1}
+    assert "Total:" in result.stdout
+    assert list(output.iterdir())
+
+
+def test_document_with_a_spreadsheet_template_points_at_the_format(
+    tmp_path: Path,
+) -> None:
+    """Template declara um formato: aplicá-lo a outro falha com a causa real."""
     from waypoint_etl.demo.document_files import write_customers_txt
 
     source = write_customers_txt(tmp_path / "clientes.txt", count=2)
@@ -220,7 +248,7 @@ def test_documents_are_rejected_with_guidance(tmp_path: Path) -> None:
     result = _migrate(source, tmp_path / "exports")
 
     assert result.exit_code == 2
-    assert "inspect" in result.stderr
+    assert "txt" in result.stderr.lower()
 
 
 def test_invalid_template_fails_before_processing(

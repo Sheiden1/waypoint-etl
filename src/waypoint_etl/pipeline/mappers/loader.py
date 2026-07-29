@@ -21,6 +21,7 @@ from .schema import (
     SUPPORTED_TEMPLATE_VERSION,
     FieldMapping,
     MappingTemplate,
+    RecordMode,
     SourceSpec,
 )
 from .transforms import available_transforms, is_known_transform
@@ -158,7 +159,39 @@ def _parse_source(data: dict[str, Any], source_name: str) -> SourceSpec:
         header_row=header_row,
         encoding=_optional_text(raw.get("encoding")),
         delimiter=_optional_text(raw.get("delimiter")),
+        record_mode=_parse_record_mode(raw, source_name),
+        record_separator=_optional_text(raw.get("record_separator")),
+        label_separator=_optional_text(raw.get("label_separator")) or ":",
     )
+
+
+def _parse_record_mode(raw: dict[str, Any], source_name: str) -> RecordMode:
+    """Interpreta ``source.record_mode``, usado apenas por documentos."""
+    value = raw.get("record_mode")
+    if value is None:
+        return RecordMode.PAGE
+    if not isinstance(value, str):
+        raise MappingError(
+            f"'source.record_mode' em '{source_name}' deve ser texto "
+            "('page' ou 'separator')."
+        )
+    try:
+        mode = RecordMode(value.strip().lower())
+    except ValueError as error:
+        options = ", ".join(item.value for item in RecordMode)
+        raise MappingError(
+            f"'source.record_mode' desconhecido em '{source_name}': '{value}'. "
+            f"Valores aceitos: {options}."
+        ) from error
+
+    if mode is RecordMode.SEPARATOR and not _optional_text(
+        raw.get("record_separator")
+    ):
+        raise MappingError(
+            f"'source.record_separator' é obrigatório em '{source_name}' "
+            "quando 'source.record_mode' é 'separator'."
+        )
+    return mode
 
 
 def _parse_source_type(raw: object, source_name: str) -> SourceFormat | None:

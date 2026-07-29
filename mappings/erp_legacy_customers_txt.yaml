@@ -1,0 +1,72 @@
+# Template De/Para: clientes em relatório TXT do ERP legado fictício.
+#
+# Documento não tem colunas. O bloco `source` declara como encontrar registros
+# no texto: aqui, blocos separados por uma linha de tracos, com campos no
+# formato `Rótulo: valor`. Cada rótulo funciona como o nome de uma coluna.
+version: 1
+name: ERP Legado - Clientes (TXT)
+entity: customers
+
+source:
+  type: txt
+  record_mode: separator
+  record_separator: '^-{10,}$'
+  label_separator: ':'
+
+fields:
+  Código:
+    target: external_id
+    required: false
+    transforms:
+      - clean_text
+
+  Nome:
+    target: full_name
+    required: true
+    transforms:
+      - clean_text
+      - title_case
+
+  CPF/CNPJ:
+    target: document
+    required: true
+    transforms:
+      - digits_only
+
+  E-mail:
+    target: email
+    required: false
+    transforms:
+      - email
+
+  Telefone:
+    target: phone
+    required: false
+    transforms:
+      - brazilian_phone
+
+  CEP:
+    target: postal_code
+    required: false
+    transforms:
+      - postal_code
+
+  Cidade:
+    target: city
+    required: false
+    transforms:
+      - clean_text
+      - title_case
+
+  UF:
+    target: state
+    required: false
+    transforms:
+      - uf
+
+  Data de Cadastro:
+    target: created_at
+    required: false
+    transforms:
+      - clean_text
+      - brazilian_date

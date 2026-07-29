@@ -274,12 +274,14 @@ uv run waypoint-etl migrate ... --no-dry-run --load-postgres
 O mapeamento entre as colunas de origem e o schema canônico é declarado em YAML
 e versionado em `mappings/`:
 
-| Template                        | Entidade    | Origem  |
-| ------------------------------- | ----------- | ------- |
-| `erp_legacy_customers.yaml`     | `customers` | Excel   |
-| `erp_legacy_customers_csv.yaml` | `customers` | CSV     |
-| `erp_legacy_contacts.yaml`      | `contacts`  | Excel   |
-| `erp_legacy_invoices.yaml`      | `invoices`  | CSV     |
+| Template                         | Entidade    | Origem  |
+| -------------------------------- | ----------- | ------- |
+| `erp_legacy_customers.yaml`      | `customers` | Excel   |
+| `erp_legacy_customers_csv.yaml`  | `customers` | CSV     |
+| `erp_legacy_customers_txt.yaml`  | `customers` | TXT     |
+| `erp_legacy_customers_docx.yaml` | `customers` | DOCX    |
+| `erp_legacy_contacts.yaml`       | `contacts`  | Excel   |
+| `erp_legacy_invoices.yaml`       | `invoices`  | CSV     |
 
 Um template declara o formato da origem: aplicá-lo a outro formato falha com
 mensagem explícita, porque o `header_row` de uma planilha desalinharia a leitura
@@ -300,6 +302,23 @@ fields:
 As transformações vêm de um catálogo fechado: um template escolhe entre funções
 conhecidas e auditáveis, nunca executa código arbitrário. Um nome inexistente
 faz o carregamento falhar listando as opções válidas.
+
+### Documentos
+
+Documento não tem colunas. O bloco `source` declara como encontrar registros no
+texto, e cada rótulo passa a funcionar como o nome de uma coluna:
+
+```yaml
+source:
+  type: txt
+  record_mode: separator     # ou "page": uma ficha por página
+  record_separator: '^-{10,}$'
+  label_separator: ':'       # o extrator DOCX usa '|'
+```
+
+Linhas sem rótulo são ignoradas, então cabeçalhos e molduras de relatório não
+viram campo. Quando o texto vem de OCR, o resultado entra no pipeline com um
+aviso explícito: reconhecimento óptico nunca é tratado como confiável.
 
 Consulte o [guia completo de mapeamento](docs/mapping-guide.md).
 
@@ -351,8 +370,9 @@ serviço PostgreSQL descartável.
 
 ## Limitações
 
-- o pipeline estruturado do MVP migra CSV e Excel; documentos são inspecionados
-  e extraídos, mas ainda não viram múltiplos registros canônicos automaticamente;
+- documentos viram registros por reconhecimento de pares `Rótulo: valor`; texto
+  corrido sem rótulos e tabelas dentro de PDF ainda não são estruturados;
+- valores lidos por OCR entram no pipeline com aviso e exigem conferência;
 - escrita manual não é suportada;
 - não há autenticação, multitenancy, filas ou integrações com ERPs comerciais;
 - possíveis duplicidades não são mescladas automaticamente;

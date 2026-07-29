@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import StrEnum
 
 from ...application.dto.extraction import ExtractionOptions
 from ...domain.enums.entity_type import EntityType
@@ -23,15 +24,29 @@ class FieldMapping:
     default: str | None = None
 
 
+class RecordMode(StrEnum):
+    """Como um documento textual é dividido em registros."""
+
+    PAGE = "page"
+    SEPARATOR = "separator"
+
+
 @dataclass(frozen=True, slots=True)
 class SourceSpec:
-    """Bloco ``source`` do template: como ler o arquivo."""
+    """Bloco ``source`` do template: como ler o arquivo.
+
+    ``record_mode``, ``record_separator`` e ``label_separator`` só se aplicam a
+    documentos (TXT, DOCX, PDF, imagem), que não têm linhas e colunas.
+    """
 
     type: SourceFormat | None = None
     sheet: str | None = None
     header_row: int = 1
     encoding: str | None = None
     delimiter: str | None = None
+    record_mode: RecordMode = RecordMode.PAGE
+    record_separator: str | None = None
+    label_separator: str = ":"
 
     def to_extraction_options(self) -> ExtractionOptions:
         """Converte a declaração do template nas opções do extrator."""
@@ -102,5 +117,6 @@ __all__ = [
     "SUPPORTED_TEMPLATE_VERSION",
     "FieldMapping",
     "MappingTemplate",
+    "RecordMode",
     "SourceSpec",
 ]

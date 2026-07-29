@@ -19,9 +19,11 @@ from sqlalchemy import Engine
 
 from ...domain.enums.entity_type import EntityType
 from ...domain.enums.run_status import RunStatus
+from ...domain.enums.source_format import SourceFormat
 from ...domain.errors import WaypointError
 from ...infrastructure.extractors.registry import (
     detect_format,
+    get_document_extractor,
     get_tabular_extractor,
     is_tabular,
 )
@@ -38,12 +40,15 @@ from ...infrastructure.reports.exporters import (
 )
 from ...logging import get_logger
 from ...pipeline.deduplication.detector import annotate_duplicates, find_duplicates
+from ...pipeline.documents.records import parse_document_records
 from ...pipeline.mappers.loader import load_mapping
 from ...pipeline.mappers.mapper import MappedRecord, apply_mapping
 from ...pipeline.mappers.schema import MappingTemplate
 from ...pipeline.validators.entities import validate_records
+from ..dto.extraction import ExtractionResult
 from ..dto.migration import MigrationRun, compute_file_hash
 from ..dto.results import MigrationResult, StageTimer
+from ..ports.ocr import OcrEngine
 
 
 class UnsupportedSourceError(WaypointError):
@@ -60,6 +65,8 @@ class MigrationRequest:
     dry_run: bool = True
     entity: EntityType | None = None
     """Entidade esperada. Quando informada, precisa bater com a do template."""
+    ocr_engine: OcrEngine | None = None
+    """Motor de OCR para documentos digitalizados. Sem ele, só texto nativo."""
 
 
 def run_migration(
@@ -76,9 +83,6 @@ def run_migration(
     with timer.measure("load_mapping"):
         template = load_mapping(request.mapping)
         _check_entity(template, request.entity)
-        # A ordem importa: para um documento, apontar o caminho certo é mais
-        # útil do que reclamar que o formato do template não bate.
-        _check_tabular(request.source)
         _check_source_format(template, request.source)
 
     run = MigrationRun(
@@ -96,10 +100,7 @@ def run_migration(
     )
 
     with timer.measure("extract"):
-        extractor = get_tabular_extractor(request.source)
-        extraction = extractor.extract(
-            request.source, template.source.to_extraction_options()
-        )
+        extraction = _extract(request, template)
 
     with timer.measure("map"):
         mapped = apply_mapping(extraction, template)
@@ -174,15 +175,38 @@ def _check_entity(template: MappingTemplate, expected: EntityType | None) -> Non
         )
 
 
-def _check_tabular(source: Path) -> None:
-    """Rejeita documentos com uma indicação do que fazer no lugar."""
-    if is_tabular(source):
-        return
-    raise UnsupportedSourceError(
-        f"'{source.name}' é um documento. Nesta versão, a migração por template "
-        "De/Para aceita apenas CSV e Excel; use 'inspect' para ler o conteúdo "
-        "de documentos."
+def _extract(
+    request: MigrationRequest, template: MappingTemplate
+) -> ExtractionResult:
+    """Lê a origem, tabular ou documento, no mesmo contrato de extração.
+
+    Planilha já vem em linhas e colunas. Documento passa antes por uma etapa de
+    estruturação que reconhece pares ``Rótulo: valor``, de modo que o restante
+    do pipeline não precisa saber a diferença.
+    """
+    if is_tabular(request.source):
+        extractor = get_tabular_extractor(request.source)
+        return extractor.extract(
+            request.source, template.source.to_extraction_options()
+        )
+
+    document_extractor = get_document_extractor(
+        request.source, ocr_engine=request.ocr_engine
     )
+    if (
+        request.ocr_engine is not None
+        and detect_format(request.source) is SourceFormat.PDF
+    ):
+        from ...infrastructure.ocr.fallback import DocumentExtractorWithOcr
+
+        document_extractor = DocumentExtractorWithOcr(
+            document_extractor, request.ocr_engine
+        )
+
+    document = document_extractor.extract_text(
+        request.source, template.source.to_extraction_options()
+    )
+    return parse_document_records(document, template.source)
 
 
 def _check_source_format(template: MappingTemplate, source: Path) -> None:

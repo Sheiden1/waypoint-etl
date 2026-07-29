@@ -9,6 +9,12 @@ versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- estruturação de documentos (TXT, DOCX, PDF e imagem) em registros canônicos
+  por reconhecimento de pares `Rótulo: valor`, declarada no bloco `source` do
+  template; documentos passam a percorrer o mesmo pipeline de uma planilha,
+  incluindo validação, deduplicação e os quatro artefatos;
+- templates versionados para TXT e DOCX;
+
 - instância pública gratuita da jornada web: interface no Vercel Hobby e API no
   Render Free, validadas pelo smoke test remoto;
 - `MAPPINGS_DIR` para localizar o catálogo De/Para independentemente do layout
