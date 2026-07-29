@@ -7,7 +7,6 @@ Execute com:
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import cast
 
 import streamlit as st
@@ -38,8 +37,6 @@ from waypoint_etl.presentation.streamlit.workflow import (
     upload_digest,
 )
 
-_PROJECT_ROOT = Path(__file__).resolve().parents[4]
-_MAPPINGS_DIR = _PROJECT_ROOT / "mappings"
 _DOWNLOAD_MIME = {
     ".csv": "text/csv",
     ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -313,7 +310,7 @@ mapping_mode = st.radio(
 mapping_source: MappingSource | None = None
 if mapping_mode == "Template pronto":
     try:
-        catalog = discover_mapping_templates(_MAPPINGS_DIR)
+        catalog = discover_mapping_templates(settings.mappings_dir)
     except MappingError as error:
         st.error(f"Um template do catálogo é inválido: {error}")
         st.stop()

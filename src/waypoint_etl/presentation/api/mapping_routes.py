@@ -8,14 +8,13 @@ from typing import Annotated, Self
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from ...config import get_settings
 from ...domain.enums.entity_type import EntityType
 from ...domain.enums.source_format import SourceFormat
 from ...pipeline.mappers.loader import MappingError, load_mapping, parse_mapping
 from ...pipeline.mappers.schema import MappingTemplate
 from .schemas import ApiError, ApiErrorResponse
 
-_PROJECT_ROOT = Path(__file__).resolve().parents[4]
-_DEFAULT_MAPPINGS_DIR = _PROJECT_ROOT / "mappings"
 _MAX_MAPPING_BYTES = 1024 * 1024
 _READ_CHUNK_BYTES = 64 * 1024
 
@@ -98,9 +97,17 @@ class MappingCatalogResponse(BaseModel):
 
 
 def create_mapping_router(
-    mappings_dir: Path = _DEFAULT_MAPPINGS_DIR,
+    mappings_dir: Path | None = None,
 ) -> APIRouter:
-    """Cria as rotas com diretório injetável para testes."""
+    """Cria as rotas com diretório injetável para testes.
+
+    Sem argumento, o catálogo vem de ``MAPPINGS_DIR``. O padrão é relativo ao
+    diretório de trabalho porque o pacote instalado não carrega os templates:
+    eles são versionados no repositório e copiados para a imagem.
+    """
+    catalog_dir = (
+        mappings_dir if mappings_dir is not None else get_settings().mappings_dir
+    )
     router = APIRouter(prefix="/api/v1/mappings", tags=["mappings"])
 
     @router.get(
@@ -118,10 +125,10 @@ def create_mapping_router(
         source_format: SourceFormat | None = None,
     ) -> MappingCatalogResponse:
         templates: list[MappingTemplateResponse] = []
-        if not mappings_dir.is_dir():
+        if not catalog_dir.is_dir():
             return MappingCatalogResponse()
 
-        for path in sorted(mappings_dir.glob("*.yaml")):
+        for path in sorted(catalog_dir.glob("*.yaml")):
             try:
                 template = load_mapping(path)
                 content = path.read_text(encoding="utf-8")

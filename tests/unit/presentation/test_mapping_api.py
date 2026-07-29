@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from waypoint_etl.config import get_settings
 from waypoint_etl.presentation.api.mapping_routes import create_mapping_router
 
 
@@ -32,6 +34,34 @@ def test_catalog_lists_and_filters_versioned_templates() -> None:
     assert template["source_format"] == "csv"
     assert template["assignments"]["Nome Cliente"] == "full_name"
     assert "version: 1" in template["content"]
+
+
+def test_catalog_default_dir_does_not_depend_on_the_source_layout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regressão: o pacote instalado não tem o nível ``src/``.
+
+    O padrão anterior derivava a raiz do repositório de ``parents[4]``, o que
+    apontava para fora do projeto quando o pacote era instalado na imagem
+    Docker e devolvia um catálogo vazio em produção.
+    """
+    (tmp_path / "mappings").mkdir()
+    (tmp_path / "mappings" / "erp_legacy_customers_csv.yaml").write_bytes(
+        Path("mappings/erp_legacy_customers_csv.yaml").read_bytes()
+    )
+    monkeypatch.chdir(tmp_path)
+    get_settings.cache_clear()
+
+    app = FastAPI()
+    app.include_router(create_mapping_router())
+    response = TestClient(app).get("/api/v1/mappings")
+
+    get_settings.cache_clear()
+    assert response.status_code == 200
+    assert [template["template_id"] for template in response.json()["templates"]] == [
+        "erp_legacy_customers_csv"
+    ]
 
 
 def test_catalog_reports_an_invalid_versioned_template(tmp_path: Path) -> None:

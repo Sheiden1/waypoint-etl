@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     tesseract_cmd: str | None = None
     ocr_language: str = "por"
     export_dir: Path = Path("./exports")
+    mappings_dir: Path = Path("./mappings")
     web_origins: str = "http://localhost:5173"
     artifact_ttl_seconds: int = Field(default=1800, ge=60, le=86_400)
 

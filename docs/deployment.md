@@ -153,6 +153,7 @@ suspensão pode ter latência adicional.
 | `MAX_UPLOAD_MB` | sim | `25`; reduza se houver pressão de memória |
 | `OCR_LANGUAGE` | sim | `por`, instalado na imagem |
 | `EXPORT_DIR` | sim | `/tmp/waypoint-exports`, sempre efêmero |
+| `MAPPINGS_DIR` | sim | `/app/mappings`, catálogo copiado para a imagem |
 | `ARTIFACT_TTL_SECONDS` | sim | `1800`; janela temporária dos downloads |
 | `WEB_ORIGINS` | sim | origens HTTPS exatas, separadas por vírgula |
 | `DATABASE_URL` | não | Neon pooled com driver `psycopg` |
@@ -248,6 +249,7 @@ ao esgotar a franquia. Acompanhe o painel de uso durante o mês.
 | `502` ou espera longa no primeiro acesso | aguarde o cold start e consulte logs/health check |
 | Deploy Render não abre porta | confirme que `PORT` não foi sobrescrita |
 | OCR aparece indisponível | confirme que o deploy usou `Dockerfile.api` |
+| Catálogo de mapeamentos vazio | confira `MAPPINGS_DIR`; o pacote instalado não carrega os YAML |
 | Banco aparece indisponível | confira `DATABASE_URL` no ambiente do Render |
 | Migração falha com pooler | configure também `DATABASE_DIRECT_URL` |
 | Processo encerra ao ler PDF/imagem | reduza `MAX_UPLOAD_MB`; 512 MB é o limite do Free |
