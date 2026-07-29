@@ -12,7 +12,8 @@ de dados; contribuições devem favorecer clareza, rastreabilidade e segurança.
 
 ## Ambiente de desenvolvimento
 
-Requisitos: Python 3.12+ e, preferencialmente, `uv`.
+Requisitos: Python 3.12+ e, preferencialmente, `uv`. Para trabalhar na interface
+web, Node.js 22.13 ou superior.
 
 ```bash
 git clone https://github.com/Sheiden1/waypoint-etl.git
@@ -24,6 +25,59 @@ uv run python -m waypoint_etl.demo
 
 No Windows, os mesmos comandos funcionam no PowerShell. Sem `uv`, crie um
 ambiente virtual e execute `pip install -e ".[dev]"`.
+
+### Executar cada interface
+
+Com `make`, em Linux ou macOS:
+
+| Comando            | Ação                                     |
+| ------------------ | ---------------------------------------- |
+| `make dev`         | interface Streamlit                      |
+| `make api`         | API FastAPI                              |
+| `make web`         | interface React                          |
+| `make docker-up`   | aplicação e PostgreSQL em contêineres    |
+| `make docker-down` | encerra os contêineres                   |
+| `make demo-data`   | gera os dados sintéticos                 |
+
+Equivalentes sem `make`:
+
+```bash
+uv run streamlit run src/waypoint_etl/presentation/streamlit/app.py
+uv run uvicorn waypoint_etl.presentation.api.app:app --reload
+npm --prefix web install && npm --prefix web run dev
+docker compose up --build
+```
+
+A interface web precisa da API rodando em paralelo, em outro terminal. Ela usa
+`VITE_API_BASE_URL` para saber onde a API está; vazio no desenvolvimento, o Vite
+encaminha as chamadas pelo próprio proxy. A documentação interativa da API fica
+em `/api/docs`.
+
+### Verificações
+
+```bash
+uv run ruff check .
+uv run mypy
+uv run pytest
+
+npm --prefix web run lint
+npm --prefix web run test:run
+npm --prefix web run build
+```
+
+Testes que dependem de serviços externos são pulados automaticamente quando eles
+não estão presentes. Para exercitá-los de verdade:
+
+```bash
+# OCR real, com Tesseract instalado
+uv run pytest tests/integration/test_ocr_tesseract.py -v
+
+# PostgreSQL real, com um banco de teste descartável
+export WAYPOINT_TEST_DATABASE_URL=postgresql+psycopg://waypoint:waypoint@localhost:5432/waypoint_test
+uv run pytest tests/integration/test_postgres_load.py -v
+```
+
+O CI executa os dois com serviços reais, além de lint, tipos e cobertura mínima.
 
 ## Fluxo de trabalho
 
@@ -54,7 +108,8 @@ docs: esclarece configuração do Tesseract
 - `application` coordena casos de uso e contratos;
 - `pipeline` contém mapeamento, normalização, validação e deduplicação;
 - `infrastructure` implementa extração, OCR, persistência e relatórios;
-- `presentation` contém CLI e Streamlit, sem duplicar regras do núcleo.
+- `presentation` contém CLI, Streamlit e a API HTTP, sem duplicar regras do
+  núcleo — nenhuma rota pode reimplementar transformação ou validação.
 
 Veja [docs/architecture.md](docs/architecture.md) para detalhes.
 

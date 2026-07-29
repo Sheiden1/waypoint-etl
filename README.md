@@ -5,147 +5,62 @@
 [![CI](https://github.com/Sheiden1/waypoint-etl/actions/workflows/ci.yml/badge.svg)](https://github.com/Sheiden1/waypoint-etl/actions/workflows/ci.yml)
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-green.svg)](LICENSE)
+[![Versão](https://img.shields.io/badge/vers%C3%A3o-v0.2.0-blue.svg)](https://github.com/Sheiden1/waypoint-etl/releases/tag/v0.2.0)
 
-Projeto pessoal **open-source** que simula uma migração realista de dados entre
-sistemas ERP e CRM legados. É uma demonstração técnica e **educacional**: não é
-uma plataforma pronta para tratamento de dados reais em produção. O uso com
-dados reais exige avaliação própria de segurança, infraestrutura e LGPD.
+Toolkit **open-source** que prepara dados legados de ERP e CRM para importação:
+extrai de planilhas e documentos, aplica um mapeamento De/Para configurável,
+normaliza dados brasileiros, valida, identifica duplicidades e gera relatórios
+auditáveis.
 
-O Waypoint é um projeto independente, sem vínculo com a HashiCorp ou qualquer
-outra organização que use o nome Waypoint.
+Projeto pessoal e **educacional**. Não é uma plataforma pronta para tratar dados
+reais em produção — o uso com dados reais exige avaliação própria de segurança,
+infraestrutura e LGPD. Projeto independente, sem vínculo com a HashiCorp ou
+qualquer outra organização que use o nome *Waypoint*.
 
-Versão atual: [v0.2.0](https://github.com/Sheiden1/waypoint-etl/releases/tag/v0.2.0).
+## Experimente
+
+**[▶ Abrir a demonstração](https://waypoint-etl.vercel.app)**
+
+Envie um CSV, monte o De/Para e baixe os relatórios, sem instalar nada.
+
+> A demonstração roda em planos gratuitos, sem autenticação e sem banco
+> configurado: a carga no PostgreSQL aparece como indisponível e o restante do
+> fluxo funciona. **Não envie dados pessoais reais.** A API hiberna após 15
+> minutos sem tráfego, então a primeira chamada pode levar cerca de um minuto.
 
 ![Resultado de uma validação no Waypoint](docs/screenshots/waypoint-result.svg)
 
-[▶ Assista à demonstração curta](docs/demo/waypoint-demo.mp4)
+[Assista à demonstração curta](docs/demo/waypoint-demo.mp4)
 
 ## O problema
 
-Empresas que trocam de ERP ou CRM recebem dados legados em formatos
-incompatíveis: planilhas com cabeçalhos diferentes, datas e valores em formatos
-inconsistentes, CPFs/CNPJs com ou sem máscara, clientes duplicados, PDFs e
-documentos escaneados. O Waypoint automatiza o fluxo:
+Quem troca de ERP ou CRM recebe dados legados em formatos incompatíveis:
+planilhas com cabeçalhos diferentes, datas e valores em formatos inconsistentes,
+CPFs e CNPJs com ou sem máscara, clientes duplicados, PDFs e documentos
+escaneados. Conferir isso à mão é lento e deixa passar erro.
+
+O Waypoint automatiza o fluxo:
 
 **extrair → mapear → limpar → normalizar → validar → deduplicar → revisar →
 carregar → auditar.**
 
+Nada é gravado sem `dry-run` antes, e toda execução é rastreável por um `run_id`.
+
 ## Recursos
 
-- CSV, Excel, TXT, DOCX, PDF digital, PDF escaneado e imagens;
-- OCR local com Tesseract e fallback por qualidade do texto;
-- templates De/Para em YAML ou criados visualmente;
-- normalização e validação de dados brasileiros;
-- detecção de duplicidades exatas e possíveis;
-- CLI e assistente Streamlit usando o mesmo núcleo;
-- `dry-run`, PostgreSQL transacional e auditoria por `run_id`;
-- exportação de aceitos, rejeitados, duplicidades e relatório JSON;
-- Docker Compose, testes automatizados, Ruff, mypy e CI.
+- **Origens:** CSV, Excel, TXT, DOCX, PDF digital, PDF escaneado e imagens;
+- **Documentos viram registros** por reconhecimento de pares `Rótulo: valor`;
+- **OCR local** com Tesseract, acionado só quando o texto nativo é insuficiente;
+- **De/Para declarativo** em YAML, versionável, ou montado visualmente;
+- **Dados brasileiros:** CPF/CNPJ com dígitos verificadores, datas, moeda em
+  `Decimal`, telefone, CEP e UF;
+- **Duplicidades** exatas e aproximadas — sinalizadas, nunca mescladas sozinhas;
+- **Três interfaces sobre o mesmo núcleo:** web, CLI e Streamlit;
+- **Auditoria:** quatro artefatos por execução e carga transacional opcional.
 
-## Requisitos
+## Instalação
 
-- Python 3.12 ou superior.
-- Node.js 22.13 ou superior para a nova interface web.
-- (Opcional) [`uv`](https://github.com/astral-sh/uv) para gerenciar o ambiente.
-
-## Instalação (desenvolvimento)
-
-Com `uv`:
-
-```bash
-uv sync --extra dev
-```
-
-Sem `uv` (venv + pip):
-
-```bash
-python -m venv .venv
-# Linux/macOS:
-source .venv/bin/activate
-# Windows (PowerShell):
-.venv\Scripts\Activate.ps1
-
-pip install -e ".[dev]"
-```
-
-## Nova interface web
-
-A jornada web usa React, TypeScript e o design system Astryx. As cinco etapas
-funcionais cobrem origem, mapeamento, validação, destino e resultado: o usuário
-inspeciona o arquivo, escolhe um template do catálogo, envia YAML ou monta o
-De/Para visualmente, executa o `dry-run`, baixa os relatórios e, quando há um
-PostgreSQL configurado, pode confirmar a carga de forma explícita.
-
-A interface apresenta a prévia real do pipeline, totais de qualidade, problemas,
-duplicidades, transformações e duração por estágio. Ela também oferece modo
-claro, escuro ou do sistema, densidade confortável ou compacta e preferência de
-movimento. Essas escolhas ficam somente no navegador e não alteram as regras do
-ETL. Temas comunitários usam um contrato TypeScript separado do núcleo.
-
-Instale o frontend uma vez:
-
-```powershell
-npm --prefix web install
-```
-
-Depois, abra dois terminais na raiz do projeto:
-
-```powershell
-# Terminal 1 — API
-uv run uvicorn waypoint_etl.presentation.api.app:app --reload
-
-# Terminal 2 — interface
-npm --prefix web run dev
-```
-
-Acesse `http://localhost:5173`. A documentação interativa da API fica em
-`http://localhost:8000/api/docs`.
-
-Os endpoints de migração recebem novamente o arquivo de origem e o YAML como
-`multipart/form-data`. O `dry-run` usa
-`POST /api/v1/migrations/dry-run`; a carga usa
-`POST /api/v1/migrations/load-postgres` com os campos `file`, `mapping`,
-`entity` e `confirm=true`. Sem confirmação, a API recusa a escrita; sem
-`DATABASE_URL`, todo o fluxo de inspeção, validação e download continua
-disponível, mas a carga aparece como indisponível.
-
-Cada validação ou carga publica somente `accepted.csv`, `rejected.xlsx`,
-`duplicates.csv` e `audit-report.json` para download pelo `run_id`. Esses
-relatórios são temporários: o TTL padrão é de 1.800 segundos e pode ser ajustado
-por `ARTIFACT_TTL_SECONDS`. O upload e o YAML são apagados ao fim da requisição;
-os relatórios também desaparecem ao vencer o TTL ou reiniciar a API. Faça os
-downloads na mesma jornada.
-
-Para verificar a interface:
-
-```powershell
-npm --prefix web run lint
-npm --prefix web run test:run
-npm --prefix web run build
-```
-
-A jornada web está publicada em serviços gratuitos, com o smoke test remoto
-aprovado nas sete checagens:
-
-| Serviço | URL | Plano |
-| --- | --- | --- |
-| Interface | <https://waypoint-etl.vercel.app> | Vercel Hobby |
-| API | <https://waypoint-etl-api.onrender.com> | Render Free |
-
-A instância pública é uma demonstração: **não envie dados pessoais reais**. Ela
-roda sem banco configurado, então a carga no PostgreSQL aparece como
-indisponível enquanto inspeção, validação e downloads seguem funcionando. A API
-gratuita entra em repouso após 15 minutos sem tráfego, e a primeira chamada
-depois disso pode levar cerca de um minuto.
-
-Consulte o [guia de deploy gratuito](docs/deployment.md) para publicar sua
-própria instância e rodar o smoke test, e o
-[roadmap da plataforma web](docs/web-platform-roadmap.md) para o estado de cada
-fase.
-
-## Início rápido com Docker
-
-Com Docker e Docker Compose instalados:
+**Docker** é o caminho mais curto para rodar tudo, incluindo PostgreSQL e OCR:
 
 ```bash
 git clone https://github.com/Sheiden1/waypoint-etl.git
@@ -153,142 +68,66 @@ cd waypoint-etl
 docker compose up --build
 ```
 
-Acesse `http://localhost:8501`. O Compose inicia PostgreSQL, aplica as migrações
-Alembic e sobe a interface com Tesseract e o idioma português instalados.
+O Compose sobe o banco, aplica as migrações e inicia a interface com Tesseract e
+o idioma português já instalados.
+
+**Como biblioteca ou CLI**, a partir do wheel publicado na
+[release mais recente](https://github.com/Sheiden1/waypoint-etl/releases/latest):
 
 ```bash
-docker compose down
+pip install waypoint_etl-0.2.0-py3-none-any.whl
 ```
 
-Use `docker compose down -v` somente quando quiser também apagar os volumes
-locais do banco e das exportações.
-
-## Comandos de desenvolvimento
-
-Com `make` (Linux/macOS):
-
-| Comando          | Ação                                   |
-| ---------------- | -------------------------------------- |
-| `make test`      | executa os testes                      |
-| `make lint`      | executa o Ruff                         |
-| `make typecheck` | executa o mypy                         |
-| `make format`    | formata o código com Ruff              |
-| `make demo-data` | gera os dados sintéticos de demonstração |
-| `make dev`       | inicia a interface Streamlit             |
-| `make api`       | inicia a API FastAPI                       |
-| `make web`       | inicia a nova interface React              |
-| `make web-test`  | testa a nova interface                     |
-| `make web-build` | gera o build do frontend                   |
-| `make docker-up` | inicia aplicação e PostgreSQL             |
-| `make docker-down` | encerra os containers                   |
-
-Equivalentes sem `make` (Windows):
+Ou direto do repositório:
 
 ```bash
-python -m pytest
-python -m ruff check .
-python -m mypy
-python -m ruff format .
-python -m waypoint_etl.demo
-uv run streamlit run src/waypoint_etl/presentation/streamlit/app.py
-uv run uvicorn waypoint_etl.presentation.api.app:app --reload
-npm --prefix web run dev
-docker compose up --build
+pip install git+https://github.com/Sheiden1/waypoint-etl.git
 ```
 
-## Dados de demonstração
+Requer Python 3.12 ou superior. O pacote ainda não é distribuído pelo PyPI. Os
+templates De/Para vivem em `mappings/`, no repositório, e não são embutidos no
+wheel — aponte `MAPPINGS_DIR` se instalar o pacote isoladamente.
 
-`make demo-data` (ou `python -m waypoint_etl.demo`) escreve em `samples/input/`:
-
-| Arquivo                 | Conteúdo                                                     |
-| ----------------------- | ------------------------------------------------------------ |
-| `clientes_legado.csv`   | clientes legados com máscaras, datas e sujeira variadas       |
-| `clientes_legado.xlsx`  | abas `Clientes` (cabeçalho na linha 2) e `Contatos`           |
-| `clientes_legado.txt`   | relatório em texto puro no estilo de exportação antiga        |
-| `ficha_cadastral.docx`  | fichas em Word, com parágrafos e tabelas rótulo/valor         |
-| `ficha_cadastral.pdf`   | fichas em PDF com camada de texto (uma por página)            |
-| `ficha_escaneada.pdf`   | PDF **sem** camada de texto, para exercitar o OCR              |
-| `ficha_escaneada.png`   | ficha como imagem digitalizada                                |
-
-Todos os registros são sintéticos e gerados com semente fixa: nenhum dado
-pessoal real é usado ou versionado.
-
-Os arquivos binários (`.xlsx`, `.docx` e `.pdf`) não são versionados — gere-os
-com `make demo-data` após clonar o repositório.
-
-## Uso pela interface
-
-Inicie o assistente web:
-
-```bash
-make dev
-```
-
-No Windows, sem `make`:
-
-```powershell
-uv run streamlit run src/waypoint_etl/presentation/streamlit/app.py
-```
-
-O assistente percorre cinco etapas: upload e inspeção, De/Para, validação em
-`dry-run`, downloads ou carga opcional no PostgreSQL e resumo da execução. O
-De/Para pode vir do catálogo em `mappings/`, de um YAML enviado ou ser criado
-pela associação visual das colunas. Os quatro artefatos continuam sendo
-gravados em `exports/<run_id>/`.
+Para montar o ambiente de desenvolvimento, veja o
+[guia de contribuição](CONTRIBUTING.md).
 
 ## Uso pela CLI
 
-Inspecionar um arquivo antes de migrar:
+Inspecionar uma origem antes de migrar:
 
 ```bash
-uv run waypoint-etl inspect samples/input/clientes_legado.xlsx --sheet Clientes --header-row 2
+waypoint-etl inspect samples/input/clientes_legado.xlsx --sheet Clientes --header-row 2
 ```
 
-Executar a migração em `dry-run` (padrão — nada é gravado no banco):
+Executar em `dry-run`, que é o padrão e nunca grava no banco:
 
 ```bash
-uv run waypoint-etl migrate \
+waypoint-etl migrate \
   --input samples/input/clientes_legado.xlsx \
   --mapping mappings/erp_legacy_customers.yaml \
   --output ./exports
 ```
 
-Cada execução gera `exports/<run_id>/` com os quatro artefatos de auditoria:
+Cada execução gera `exports/<run_id>/` com quatro artefatos:
 
-| Arquivo             | Conteúdo                                              |
-| ------------------- | ----------------------------------------------------- |
-| `accepted.csv`      | registros válidos, no schema canônico                  |
-| `rejected.xlsx`     | uma linha por problema, com os valores de origem       |
-| `duplicates.csv`    | duplicatas exatas e suspeitas                          |
-| `audit-report.json` | metadados, totais, duração por estágio e alertas       |
+| Arquivo             | Conteúdo                                          |
+| ------------------- | ------------------------------------------------- |
+| `accepted.csv`      | registros válidos, no schema canônico             |
+| `rejected.xlsx`     | uma linha por problema, com os valores de origem  |
+| `duplicates.csv`    | duplicatas exatas e suspeitas                     |
+| `audit-report.json` | metadados, totais, duração por estágio e alertas  |
 
-O comando sai com código `1` quando há registros rejeitados, o que permite usá-lo
-em verificação automatizada. Para efetivar a carga no PostgreSQL:
+O comando sai com código `1` quando há rejeitados, o que permite usá-lo em
+verificação automatizada. Para efetivar a carga:
 
 ```bash
-uv run waypoint-etl migrate ... --no-dry-run --load-postgres
+waypoint-etl migrate ... --no-dry-run --load-postgres
 ```
 
 ## Mapeamento De/Para
 
-O mapeamento entre as colunas de origem e o schema canônico é declarado em YAML
-e versionado em `mappings/`:
-
-| Template                         | Entidade    | Origem  |
-| -------------------------------- | ----------- | ------- |
-| `erp_legacy_customers.yaml`      | `customers` | Excel   |
-| `erp_legacy_customers_csv.yaml`  | `customers` | CSV     |
-| `erp_legacy_customers_txt.yaml`  | `customers` | TXT     |
-| `erp_legacy_customers_docx.yaml` | `customers` | DOCX    |
-| `erp_legacy_contacts.yaml`       | `contacts`  | Excel   |
-| `erp_legacy_invoices.yaml`       | `invoices`  | CSV     |
-
-Um template declara o formato da origem: aplicá-lo a outro formato falha com
-mensagem explícita, porque o `header_row` de uma planilha desalinharia a leitura
-de um CSV.
-
-O bloco `source` diz como ler o arquivo (aba, linha do cabeçalho, delimitador) e
-cada campo declara o destino canônico e as transformações aplicadas:
+O vínculo entre a origem e o schema canônico é declarado em YAML e versionado
+em `mappings/`:
 
 ```yaml
 fields:
@@ -299,28 +138,28 @@ fields:
       - digits_only
 ```
 
-As transformações vêm de um catálogo fechado: um template escolhe entre funções
-conhecidas e auditáveis, nunca executa código arbitrário. Um nome inexistente
-faz o carregamento falhar listando as opções válidas.
+As transformações vêm de um **catálogo fechado**: um template escolhe entre
+funções conhecidas e auditáveis, nunca executa código arbitrário. Um nome
+inexistente faz o carregamento falhar listando as opções válidas.
 
-### Documentos
-
-Documento não tem colunas. O bloco `source` declara como encontrar registros no
-texto, e cada rótulo passa a funcionar como o nome de uma coluna:
+O bloco `source` diz como ler a origem. Para documentos, que não têm colunas,
+ele declara como encontrar registros no texto — e cada rótulo passa a funcionar
+como o nome de uma coluna:
 
 ```yaml
 source:
   type: txt
-  record_mode: separator     # ou "page": uma ficha por página
+  record_mode: separator      # ou "page": uma ficha por página
   record_separator: '^-{10,}$'
-  label_separator: ':'       # o extrator DOCX usa '|'
+  label_separator: ':'        # o extrator DOCX usa '|'
 ```
 
 Linhas sem rótulo são ignoradas, então cabeçalhos e molduras de relatório não
-viram campo. Quando o texto vem de OCR, o resultado entra no pipeline com um
-aviso explícito: reconhecimento óptico nunca é tratado como confiável.
+viram campo. Texto vindo de OCR entra com aviso explícito: reconhecimento óptico
+nunca é tratado como confiável.
 
-Consulte o [guia completo de mapeamento](docs/mapping-guide.md).
+O repositório traz templates para clientes (Excel, CSV, TXT e DOCX), contatos e
+cobranças. Veja o [guia completo de mapeamento](docs/mapping-guide.md).
 
 ## Arquitetura
 
@@ -334,57 +173,58 @@ flowchart LR
     APP --> INFRA["Extração · OCR · PostgreSQL · relatórios"]
 ```
 
-O projeto é um monólito modular em camadas. O domínio não depende de interface,
-banco ou OCR; CLI, Streamlit e FastAPI apenas montam parâmetros e apresentam os
-mesmos objetos de resultado. Veja [docs/architecture.md](docs/architecture.md).
+Monólito modular em camadas. O domínio não depende de interface, banco ou OCR;
+CLI, Streamlit e FastAPI apenas montam parâmetros e apresentam os mesmos objetos
+de resultado — nenhuma rota HTTP duplica regra do pipeline.
 
-## Requisitos externos
+Detalhes em [docs/architecture.md](docs/architecture.md), e o histórico da
+jornada web em [docs/web-platform-roadmap.md](docs/web-platform-roadmap.md).
 
-Duas funcionalidades dependem de programas que **não** vêm com as dependências
-Python. A ausência de qualquer um deles não impede o projeto de rodar — apenas
-limita o que está disponível, sempre com mensagem explícita:
+## Dependências externas opcionais
 
-| Recurso        | Sem ele                                                       |
-| -------------- | ------------------------------------------------------------- |
-| **PostgreSQL** | só o modo `dry-run`; exportações continuam funcionando         |
-| **Tesseract**  | PDFs escaneados e imagens não são lidos (os demais formatos sim) |
+Nenhuma delas impede o projeto de rodar — cada ausência apenas limita o que está
+disponível, sempre com mensagem explícita:
 
-Para o OCR, instale o Tesseract e, se ele não estiver no `PATH`, aponte
-`TESSERACT_CMD` no `.env`. O pacote de idioma português (`por`) é recomendado;
-sem ele o Waypoint cai para o inglês em vez de falhar.
+| Recurso        | Sem ele                                                          |
+| -------------- | ---------------------------------------------------------------- |
+| **PostgreSQL** | só o modo `dry-run`; exportações continuam funcionando            |
+| **Tesseract**  | PDFs escaneados e imagens não são lidos; os demais formatos, sim  |
 
-Os testes que dependem desses serviços são pulados automaticamente quando eles
-não estão presentes:
+Para o OCR, o pacote de idioma português (`por`) é recomendado; sem ele o
+Waypoint cai para o inglês em vez de falhar. No CI, ambos rodam de verdade.
 
-```bash
-# OCR real (exige o Tesseract instalado)
-uv run pytest tests/integration/test_ocr_tesseract.py -v
+## Dados de demonstração
 
-# PostgreSQL real (exige um banco de teste descartável)
-export WAYPOINT_TEST_DATABASE_URL=postgresql+psycopg://waypoint:waypoint@localhost:5432/waypoint_test
-uv run pytest tests/integration/test_postgres_load.py -v
-```
+`python -m waypoint_etl.demo` gera em `samples/input/` um conjunto sintético com
+clientes, contatos e cobranças em todos os formatos suportados, incluindo um PDF
+sem camada de texto e uma imagem para exercitar o OCR.
 
-No CI, ambos são executados de verdade: o runner instala Tesseract e usa um
-serviço PostgreSQL descartável.
+Todos os registros são gerados com semente fixa: **nenhum dado pessoal real é
+usado ou versionado.** Os arquivos binários não vão para o Git — gere-os depois
+de clonar.
 
 ## Limitações
 
-- documentos viram registros por reconhecimento de pares `Rótulo: valor`; texto
-  corrido sem rótulos e tabelas dentro de PDF ainda não são estruturados;
-- valores lidos por OCR entram no pipeline com aviso e exigem conferência;
+- documentos viram registros por pares `Rótulo: valor`; texto corrido sem
+  rótulos e tabelas dentro de PDF ainda não são estruturados;
+- valores lidos por OCR entram com aviso e exigem conferência;
 - escrita manual não é suportada;
-- não há autenticação, multitenancy, filas ou integrações com ERPs comerciais;
-- possíveis duplicidades não são mescladas automaticamente;
+- não há autenticação, multitenancy, filas ou integração com ERPs comerciais;
+- possíveis duplicidades são sinalizadas, nunca mescladas automaticamente;
 - documentos enviados não têm armazenamento permanente;
 - uso com dados reais exige avaliação própria de segurança e LGPD.
 
-## Contribuição e segurança
+## Contribuindo
 
-Leia [CONTRIBUTING.md](CONTRIBUTING.md), o
-[Código de Conduta](CODE_OF_CONDUCT.md) e a
-[Política de Segurança](SECURITY.md). Bugs e melhorias podem ser abertos pelos
-templates de issue. Vulnerabilidades devem usar o relato privado do GitHub.
+Contribuições são bem-vindas. Comece pelo [guia de contribuição](CONTRIBUTING.md),
+que cobre ambiente, fluxo de trabalho e verificações, e pelo
+[Código de Conduta](CODE_OF_CONDUCT.md).
+
+Bugs e melhorias podem ser abertos pelos templates de issue. Vulnerabilidades
+devem usar o relato privado descrito na [Política de Segurança](SECURITY.md).
+
+Para publicar sua própria instância em serviços gratuitos, veja o
+[guia de deploy](docs/deployment.md).
 
 ## Licença
 
@@ -396,9 +236,16 @@ Distribuído sob a licença [MIT](LICENSE).
 
 **Waypoint** is an open-source, educational toolkit that simulates a realistic
 data migration between legacy ERP and CRM systems. It extracts data from
-spreadsheets and documents, applies a configurable field mapping, cleans and
-normalizes Brazilian data (dates, currency, CPF/CNPJ, phones), validates and
-deduplicates records, and produces auditable migration reports. This is a
-portfolio/demo project — **not** a production-ready data platform. It is an
-independent project and is **not** affiliated with HashiCorp or any other
-organization using the *Waypoint* name.
+spreadsheets and documents — including scanned files via local OCR — applies a
+configurable field mapping, cleans and normalizes Brazilian data (dates,
+currency, CPF/CNPJ, phones, postal codes), validates records, flags duplicates,
+and produces auditable migration reports. A `dry-run` mode guarantees nothing is
+written to the database until you confirm.
+
+Try the [live demo](https://waypoint-etl.vercel.app) — but please **do not
+upload real personal data**: it runs on free tiers without authentication.
+
+This is a portfolio/demo project, **not** a production-ready data platform. It
+is independent and **not** affiliated with HashiCorp or any other organization
+using the *Waypoint* name. Contributions are welcome — see
+[CONTRIBUTING.md](CONTRIBUTING.md).
