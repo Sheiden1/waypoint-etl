@@ -14,7 +14,7 @@ dados reais exige avaliação própria de segurança, infraestrutura e LGPD.
 O Waypoint é um projeto independente, sem vínculo com a HashiCorp ou qualquer
 outra organização que use o nome Waypoint.
 
-Versão atual: [v0.1.0](https://github.com/Sheiden1/waypoint-etl/releases/tag/v0.1.0).
+Versão atual: [v0.2.0](https://github.com/Sheiden1/waypoint-etl/releases/tag/v0.2.0).
 
 ![Resultado de uma validação no Waypoint](docs/screenshots/waypoint-result.svg)
 
@@ -30,7 +30,7 @@ documentos escaneados. O Waypoint automatiza o fluxo:
 **extrair → mapear → limpar → normalizar → validar → deduplicar → revisar →
 carregar → auditar.**
 
-## Recursos da v0.1.0
+## Recursos
 
 - CSV, Excel, TXT, DOCX, PDF digital, PDF escaneado e imagens;
 - OCR local com Tesseract e fallback por qualidade do texto;

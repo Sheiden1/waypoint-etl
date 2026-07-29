@@ -1080,12 +1080,19 @@ Inclua os resultados esperados em `samples/expected/` para permitir verificaçã
 
 ## 24. Roadmap posterior
 
-### Jornada web `v0.2.0`
+### Jornada web `v0.2.0` ✅ (fases 1–6 concluídas)
 
 A arquitetura, os contratos e os critérios de aceite da nova interface estão em
 `docs/web-platform-roadmap.md`. A implementação usa React, Vite, TypeScript,
 Astryx e uma API FastAPI fina sobre os casos de uso existentes. O Streamlit
-permanece como interface clássica até o fluxo web alcançar paridade funcional.
+permanece como interface clássica: a jornada web já cobre o fluxo de cinco
+etapas, mas remover o Streamlit é decisão separada e ainda não tomada.
+
+> As seis fases estão concluídas e a instalação pública gratuita foi validada
+> pelo smoke test remoto: interface em `https://waypoint-etl.vercel.app` (Vercel
+> Hobby) e API em `https://waypoint-etl-api.onrender.com` (Render Free). Sem
+> banco configurado, a carga aparece como indisponível e o restante do fluxo
+> continua funcionando.
 
 Princípios adicionais desta jornada:
 
@@ -1098,12 +1105,18 @@ Princípios adicionais desta jornada:
 
 ### `v0.2.0`
 
-- histórico visual de execuções;
-- templates criados pela interface;
-- API REST opcional;
-- comparação entre origem e destino;
-- reconciliação pós-migração;
-- exportação de relatório em PDF.
+- [x] templates criados pela interface;
+- [x] API REST opcional;
+- [ ] histórico visual de execuções;
+- [ ] comparação entre origem e destino;
+- [ ] reconciliação pós-migração;
+- [ ] exportação de relatório em PDF.
+
+Entrou nesta versão sem estar previsto aqui: a **estruturação de documentos em
+registros canônicos**. TXT, DOCX, PDF e imagem passaram a percorrer o mesmo
+pipeline de uma planilha, por reconhecimento de pares `Rótulo: valor` declarado
+no bloco `source` do template. Isso fecha o item "PDF digital para registros
+canônicos" da seção 19, que era previsto e não estava implementado.
 
 ### `v0.3.0`
 

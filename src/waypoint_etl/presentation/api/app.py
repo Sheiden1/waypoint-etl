@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import Engine
 from sqlalchemy.exc import SQLAlchemyError
 
+from ... import __version__
 from ...application.dto.extraction import ExtractionOptions
 from ...application.dto.results import MigrationResult
 from ...application.use_cases.run_migration import MigrationRequest, run_migration
@@ -73,7 +74,7 @@ def create_app(
     application = FastAPI(
         title="Waypoint API",
         summary="API local e open-source para o pipeline Waypoint.",
-        version="0.1.0",
+        version=__version__,
         docs_url="/api/docs",
         redoc_url=None,
         openapi_url="/api/openapi.json",
