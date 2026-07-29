@@ -247,10 +247,10 @@ duplicidades) executando na infraestrutura pública.
 
 Duas observações operacionais registradas durante a publicação:
 
-- o repositório foi importado no Render por URL pública, sem a GitHub App. Como
-  o Render não consegue ler o status dos checks nessa configuração, o
-  `autoDeployTrigger: checksPass` do `render.yaml` não dispara: cada push exige
-  um deploy manual até que a integração seja instalada;
+- o `autoDeployTrigger: checksPass` do `render.yaml` depende da GitHub App do
+  Render estar instalada no repositório. Enquanto o serviço esteve ligado
+  apenas por URL pública, o Render não conseguia ler o status dos checks e
+  nenhum push publicava sozinho: cada versão exigia deploy manual;
 - no Vercel, apenas o alias canônico de produção é público. As URLs por
   deployment e por branch respondem `302` para o SSO da Vercel por causa do
   Deployment Protection, e não servem para divulgação nem para o smoke test.

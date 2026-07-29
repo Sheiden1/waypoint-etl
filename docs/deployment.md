@@ -250,7 +250,7 @@ ao esgotar a franquia. Acompanhe o painel de uso durante o mês.
 | Deploy Render não abre porta | confirme que `PORT` não foi sobrescrita |
 | OCR aparece indisponível | confirme que o deploy usou `Dockerfile.api` |
 | Catálogo de mapeamentos vazio | confira `MAPPINGS_DIR`; o pacote instalado não carrega os YAML |
-| Push não dispara deploy no Render | com repo importado por URL, sem GitHub App, `checksPass` não vê os checks; use Manual Deploy ou instale a integração |
+| Push não dispara deploy no Render | `checksPass` exige a GitHub App do Render instalada no repositório; sem ela o serviço não lê o status dos checks. Instale a integração e reconecte o repositório no serviço, ou use Manual Deploy |
 | Smoke test recebe `302` do frontend | use o alias canônico de produção; URLs por deployment e por branch caem no SSO do Deployment Protection |
 | Banco aparece indisponível | confira `DATABASE_URL` no ambiente do Render |
 | Migração falha com pooler | configure também `DATABASE_DIRECT_URL` |
